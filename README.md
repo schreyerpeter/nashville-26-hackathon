@@ -21,6 +21,9 @@ and the patient API are configured.
 See [DISCOURSE.md](DISCOURSE.md) for the sign-in flow, the environment variables,
 the Azure setup, the DevTools demo panel, and the path to production.
 
+See [PLAN.md](PLAN.md) for what we're building next for the hackathon: the safety net,
+the come-back loop, retention data in Snowflake, and the demo script.
+
 ## Design
 
 The UI uses QuickMD's design system: its tokens are ported into
