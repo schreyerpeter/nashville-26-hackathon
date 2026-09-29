@@ -10,16 +10,17 @@ TypeScript, Tailwind) on Vercel, with continuous deployment from `main`.
 ```bash
 npm install
 cp .env.example .env.local   # fill in the Discourse and patient API values
+scripts/discourse-local.sh setup   # first time; afterwards `scripts/discourse-local.sh start`
 npm run dev
 ```
 
-The app runs at http://localhost:3000. `/` is the patient landing page,
+The app runs at http://localhost:3000 and Discourse at http://localhost:4200. `/` is the patient landing page,
 `/community/login` is the sign-in page Discourse sends patients to, and
 `/api/health` reports the environment, the deployed commit, and whether Discourse
 and the patient API are configured.
 
 See [DISCOURSE.md](DISCOURSE.md) for the sign-in flow, the environment variables,
-the Azure setup, the DevTools demo panel, and the path to production.
+running Discourse locally, the DevTools demo panel, and the path to production.
 
 See [PLAN.md](PLAN.md) for what we're building next for the hackathon: the safety net,
 the come-back loop, retention data in Snowflake, and the demo script.

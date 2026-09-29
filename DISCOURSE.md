@@ -48,81 +48,70 @@ those groups with visibility set to "group owners and staff".
 The code lives in `src/lib/discourse/connect.ts`, `src/lib/quickmd/api.ts`,
 `src/app/api/discourse/` and `src/app/community/login/`.
 
-## Environments
+## Running it locally
 
-| Variable | Dev value |
+Discourse can't run on Vercel: it needs a long-running Rails server, Sidekiq workers,
+Postgres and Redis. So it runs on your machine in Discourse's official development
+container, and this app runs beside it with `npm run dev`.
+
+| | URL |
 | --- | --- |
-| `QUICKMD_API_URL` | `https://patient-web-api.gimli.quickmd.dev/` (has the shared Playwright test patient) |
-| `DISCOURSE_URL` | `https://community.dev-common.quickmd.dev` |
-| `DISCOURSE_CONNECT_SECRET` | `openssl rand -hex 32`, and must match Discourse's `discourse_connect_secret` |
+| This app | http://localhost:3000 |
+| Discourse | http://localhost:4200. Not Discourse's usual 3000, which this app uses |
+| Mailpit (every email Discourse sends) | http://localhost:8025 |
 
-DiscourseConnect runs entirely through browser redirects, and the Discourse server
-never calls this app. So `discourse_connect_url` can point at `http://localhost:3000`
-for local testing, or at the Vercel deployment for everyone else.
+**Prerequisites:** a Docker runtime. On a Mac, `brew install colima docker`, then
+`colima start --cpu 4 --memory 12 --disk 60`. With less than 12 GB, the asset builder runs out of memory and takes the server down with it. The dev image has native arm64 builds.
 
-## Azure (dev)
+**First time:**
 
-Everything is in subscription **QuickMD2 Subscription**, resource group
-`rg-dev-common-westus`, and tagged `purpose=discourse-hackathon`:
+1. Fill in `.env.local`:
 
-| Resource | Name |
-| --- | --- |
-| VM (Ubuntu 24.04, B2ms, 64 GB) | `vm-community-dev`, static IP `20.237.210.22`, SSH user `qmdadmin` |
-| NSG | `vm-community-devNSG`: 80 and 443 from the internet; 22 from the installer's IP only |
-| DNS | `community` A record in `dev-common.quickmd.dev` (resource group `rg-dev-common`) |
-| Email | `ecs-community-dev` (Azure-managed domain) and `acs-community-dev` |
-| SMTP identity | Entra app `acs-community-dev-smtp` |
+   | Variable | Value |
+   | --- | --- |
+   | `QUICKMD_API_URL` | `https://patient-web-api.gimli.quickmd.dev/`, which has the shared Playwright test patient |
+   | `DISCOURSE_URL` | `http://localhost:4200` |
+   | `DISCOURSE_CONNECT_SECRET` | `openssl rand -hex 32` |
+   | `DEMO_PATIENT_EMAIL`, `DEMO_PATIENT_PASSWORD` | optional; see `~/quickmd/patient-web/tests/.env.test.example` |
 
-To delete everything:
-`az resource list -g rg-dev-common-westus --tag purpose=discourse-hackathon`, delete
-those resources, then remove the DNS record.
+2. Run `scripts/discourse-local.sh setup`. It clones Discourse to `~/quickmd/discourse`
+   and starts the container. It then installs gems and packages, migrates the database,
+   applies the settings below, starts the server, and writes `DISCOURSE_API_KEY` into
+   `.env.local`. Expect about 15 minutes the first time.
+3. Restart `npm run dev` so it picks up the API key.
 
-Discourse runs the standard single-container install from
-[discourse_docker](https://github.com/discourse/discourse_docker) at `/var/discourse`,
-with Let's Encrypt TLS. To rebuild after editing `containers/app.yml`:
+**After that:** `scripts/discourse-local.sh start`, `stop`, or `logs`. The database lives
+in `~/quickmd/discourse/data/postgres` and survives restarts.
 
-```bash
-ssh -i ~/.ssh/qmd-community-dev qmdadmin@20.237.210.22
-cd /var/discourse && sudo ./launcher rebuild app
-```
+DiscourseConnect runs entirely through browser redirects, and Discourse never calls
+this app. The one server-to-server call goes the other way: when you sign out, the app
+calls Discourse's admin API.
 
-Site settings that make it patient-only:
+Site settings that make it patient-only (applied by `configure`, which you can re-run
+on its own):
 
 - `enable_discourse_connect`, `discourse_connect_url`, `discourse_connect_secret`
 - `discourse_connect_overrides_groups`, `auth_overrides_username`
 - `auth_overrides_email`, which requires `email_editable=false`
-- `login_required`, `wizard_enabled=false`
-- `enable_names=false`
-- `logout_redirect=<app>/api/discourse/logout`
-- `external_system_avatars_enabled=false` and `automatically_download_gravatars=false`,
+- `login_required`, `wizard_enabled=false`, `enable_names=false`
+- `logout_redirect=<app>/api/discourse/logout`, `maximum_session_age=720` (30 days)
+- `external_system_avatars_url` blank and `automatically_download_gravatars=false`,
   so no patient email hashes go to Gravatar
-- `verbose_discourse_connect_logging` (dev only)
+- `port=4200`, so the return URLs Discourse signs point at the right port
 
-The `patients` group already exists, with both visibility settings at "group owners
-and staff". The local admin is `qmd_admin` (`peter@quick.md`), but DiscourseConnect
-turns off password login. So staff come in through SSO like everyone else. To promote
-an SSO user, run `User.find_by(username: "…").grant_admin!` with `rails runner`
-inside the container.
+The script also creates a hidden `patients` group, visible only to its owners and staff.
+DiscourseConnect turns off password login, so staff come in through SSO like everyone
+else. To promote a user, run
+`docker exec -u discourse -w /src discourse_dev bin/rails runner 'User.find_by(username: "…").grant_admin!'`.
 
-### Email (needs an Azure admin once)
-
-SMTP goes through Azure Communication Services at `smtp.azurecomm.net:587`, sending
-from `DoNotReply@49f03799-2b1c-4db8-b677-847e0225be03.azurecomm.net`. The
-Entra app `acs-community-dev-smtp` needs the **Communication and Email Service Owner**
-role on `acs-community-dev`, and assigning roles takes Owner or User Access
-Administrator. After that:
-
-1. Create a client secret with
-   `az ad app credential reset --id c1018c13-1f1c-4f47-9af7-e9c764e665fe --append`.
-2. Put it in `DISCOURSE_SMTP_PASSWORD` in `containers/app.yml` on the VM.
-3. Rebuild.
-
-Login works without email. Only notifications and digests need it.
+Email works locally: activation mail for patients with an unverified QuickMD email lands in
+Mailpit, where you can click the link.
 
 ## Path to production
 
-- **Hosting:** keep it on Azure under the Microsoft BAA, in its own resource group,
-  with backups to storage we own.
+- **Hosting:** a VM running the official `discourse_docker` install, on Azure under the
+  Microsoft BAA, in its own resource group, with backups to storage we own and email
+  through a BAA-covered provider.
 - **Where SSO lives:** the provider moves into the backend, modelled on
   `LiveChatCreateAuthTokenApiRequestHandler.cs`, which already signs `external_id` and
   `email` for Zendesk. Patient-web's session sits in localStorage, not a cookie, so

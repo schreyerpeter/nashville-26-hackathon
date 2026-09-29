@@ -15,6 +15,7 @@ export type DevToolsProps = {
   environment: Record<string, string>;
   forumUrl: string;
   docUrl: string;
+  mailUrl: string | null;
   demoPatientEmail: string | null;
 };
 
@@ -89,7 +90,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function DemoTab({ forumUrl, docUrl, demoPatientEmail, environment }: DevToolsProps) {
+function DemoTab({ forumUrl, docUrl, mailUrl, demoPatientEmail, environment }: DevToolsProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -176,8 +177,8 @@ function DemoTab({ forumUrl, docUrl, demoPatientEmail, environment }: DevToolsPr
           </li>
           <li>The forum gets a pseudonym. The same patient always gets the same one.</li>
           <li>
-            Patients with an unverified email wait for a confirmation email, which can&apos;t send until
-            Azure email is set up.
+            Patients with an unverified email get a confirmation email first. Locally it lands in
+            Mailpit.
           </li>
           <li>
             The app and the forum each keep a session for up to 30 days. Signing out of either one
@@ -196,6 +197,11 @@ function DemoTab({ forumUrl, docUrl, demoPatientEmail, environment }: DevToolsPr
           <a href="/community/login" className={link}>
             Sign-in page
           </a>
+          {mailUrl && (
+            <a href={mailUrl} target="_blank" rel="noreferrer" className={link}>
+              Mailpit
+            </a>
+          )}
           <a href={docUrl} target="_blank" rel="noreferrer" className={link}>
             How it&apos;s wired
           </a>

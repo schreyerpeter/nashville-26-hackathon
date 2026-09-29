@@ -19,6 +19,8 @@ export function DevToolsShell() {
       }}
       forumUrl={DISCOURSE_URL}
       docUrl={COMMUNITY_DOC_URL}
+      // The dev container's mail catcher, when Discourse runs locally.
+      mailUrl={DISCOURSE_URL.startsWith("http://localhost") ? "http://localhost:8025" : null}
       demoPatientEmail={DEMO_PATIENT_EMAIL || null}
     />
   );
