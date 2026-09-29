@@ -6,6 +6,8 @@
 #   scripts/discourse-local.sh start   # start the container and the Discourse dev server
 #   scripts/discourse-local.sh seed    # QuickMD branding plus sample members and topics (re-runnable;
 #                                      # add --reset to replace earlier sample content)
+#   scripts/discourse-local.sh safety  # watched words, held-post copy, staff-only PMs, private email
+#                                      # (re-runnable; add --verify to test it end to end)
 #   scripts/discourse-local.sh stop    # stop both
 #   scripts/discourse-local.sh theme   # (re)install the QuickMD theme and logo from discourse-theme/
 #   scripts/discourse-local.sh logs    # follow the dev server log
@@ -154,6 +156,7 @@ RUBY
   fi
   echo "Configured DiscourseConnect against $APP_URL."
   install_theme
+  safety
 }
 
 # Imports discourse-theme/ (QuickMD's design system as a Discourse theme), makes it the
@@ -194,6 +197,26 @@ seed() {
   rm -rf "$DISCOURSE_DIR/tmp/qmd-seed.rb" "$DISCOURSE_DIR/tmp/qmd-seed-assets"
 }
 
+# scripts/discourse-safety.rb: the community's safety net and email privacy. --verify checks
+# each setting and posts crisis, diversion and PM test messages as the test patient; add
+# --keep to leave the held crisis post in the review queue for a demo.
+safety() {
+  local verify=0 keep=0 arg
+  for arg in "$@"; do
+    case "$arg" in
+      --verify) verify=1 ;;
+      --keep) keep=1 ;;
+    esac
+  done
+  cp "$APP_DIR/scripts/discourse-safety.rb" "$DISCOURSE_DIR/tmp/qmd-safety.rb"
+  local status=0
+  docker exec -u discourse:discourse -w /src \
+    -e QMD_SAFETY_VERIFY=$verify -e QMD_SAFETY_KEEP=$keep -e QMD_PORT=$PORT \
+    "$NAME" bin/rails runner tmp/qmd-safety.rb || status=$?
+  rm -f "$DISCOURSE_DIR/tmp/qmd-safety.rb"
+  return $status
+}
+
 case "${1:-}" in
   setup)
     preflight
@@ -211,6 +234,7 @@ case "${1:-}" in
     ;;
   configure) preflight; configure ;;
   seed) preflight; seed "${2:-}" ;;
+  safety) preflight; shift; safety "$@" ;;
   theme) preflight; install_theme ;;
   start) preflight; start_container; start_server ;;
   stop)
@@ -219,7 +243,7 @@ case "${1:-}" in
     ;;
   logs) tail -f "$DISCOURSE_DIR/log/dev-server.log" ;;
   *)
-    sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac

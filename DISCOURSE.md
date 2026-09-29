@@ -72,6 +72,7 @@ container, and this app runs beside it with `npm run dev`.
    - clones Discourse to `~/quickmd/discourse` and starts the container
    - installs gems and packages, and migrates the database
    - applies the settings below and writes `DISCOURSE_API_KEY` into `.env.local`
+   - applies the community safety settings (below)
    - seeds sample content (below)
    - starts the server
 
@@ -133,6 +134,48 @@ else. To promote a user, run
 
 Email works locally: activation mail for patients with an unverified QuickMD email lands in
 Mailpit, where you can click the link.
+
+## Community safety settings
+
+`scripts/discourse-local.sh safety` applies the safety net and email privacy settings from
+PLAN.md. `configure`, and therefore `setup`, also runs it. It's safe to re-run. The word
+lists and the held-post copy are at the top of `scripts/discourse-safety.rb`, so clinical
+ops can edit them there.
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| Watched words, **Block** | `DIVERSION_WORDS`: 9 phrases such as `sell* my sub*`, `anyone want to buy`, `hit me up for pills` | Selling, trading or buying meds is refused outright. The poster is told which phrase matched |
+| Watched words, **Require approval** | `CRISIS_WORDS`: 13 phrases such as `suicid*`, `end my life`, `self-harm*`, `overdos*`, `took too many` | Suicidal thoughts, self-harm or an overdose in progress are held for staff and never published. They're held rather than blocked, because a refused post tells someone in crisis to go away |
+| `watched_words_regular_expressions` | `false` | Plain phrases already match whole words only, and `*` means "any letters": `sub*` catches "suboxone" but not "Subway", and `overdos*` doesn't catch "overdue". Regex mode is site-wide, drops those word boundaries, and silently skips a bad pattern |
+| Held-post copy (`js.review.approval.title` / `.description`) | "Thanks for sharing", then 988 (call or text), 911, SAMHSA 1-800-662-4357 and "message your care team" | The poster sees it privately the moment a post is held. Other members see nothing, so the post never reveals that someone is in crisis |
+| `personal_message_enabled_groups` | `1\|2\|3` (admins, moderators, staff) | No patient-to-patient DMs, where diversion happens and the filters can't hold anything. Staff can still message patients |
+| `chat_enabled` | `false` | Chat is another private channel. `chat_allowed_groups` and `direct_message_enabled_groups` are staff-only too, in case someone turns it back on |
+| `private_email` | `true` | Notification emails say there's a reply and link to it, without the post text |
+| `slug_generation_method` | `none` | URLs are `/t/topic/123`, so titles like "Day 4 off…" don't end up in browser history, link previews or email links |
+| `disable_mailing_list_mode` | `true` | No email for every post. `default_email_mailing_list_mode` is `false` too |
+| `default_email_digest_frequency` | `0` (never), plus every existing member's digest turned off | Digests include titles and excerpts. This app will send its own content-free weekly email instead |
+
+Things to know:
+- Re-running adds missing words and resets their action, but never deletes one, so words
+  added in Admin → Customize → Watched words stay. To retire a word, remove it from the list
+  and delete it in the admin UI.
+- The held-post dialog shows for *any* held post, so its copy mustn't assume a crisis. Today
+  the only other thing that holds a post is Discourse's fast-typer check on brand-new (TL0)
+  members.
+- Staff are exempt from watched words.
+
+**Verify:** `scripts/discourse-local.sh safety --verify` checks every setting, the word
+lists and each member's email options. It checks that everyday sentences ("a sub at
+Subway", "my refill was overdue", "self-care Sunday") don't match. Then it posts through
+the real HTTP API as the test patient `patient-3fac98f6`, using a temporary API key it
+revokes afterwards:
+- a crisis post must come back `enqueued` and be in the review queue for a watched word
+- a diversion post must get a 422
+- a PM from the test patient and from a TL1 member must both be refused
+- an ordinary post must be published
+
+It cleans up after itself and exits non-zero if anything fails. Add `--keep` to leave the
+held crisis post in `/review` for a demo.
 
 ## Path to production
 
