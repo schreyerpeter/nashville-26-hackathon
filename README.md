@@ -12,7 +12,7 @@ cp .env.example .env.local   # fill in once the Supabase project exists
 npm run dev
 ```
 
-The app runs at http://localhost:3000. `/api/health` reports the environment, the
+The app runs at http://localhost:3000. `/ideas` is the team idea board, and `/api/health` reports the environment, the
 deployed commit, and whether Supabase is reachable.
 
 ## Deploys
@@ -38,12 +38,34 @@ clear error when the credentials are missing rather than failing deeper in a
 request, and `isSupabaseConfigured()` from `@/lib/supabase/env` lets a page
 degrade gracefully instead of throwing at all.
 
+## Database
+
+Schema changes live in `supabase/migrations`. The CLI is linked to project
+`apwrrmmbkxwniibbzaep` (run `supabase link --project-ref apwrrmmbkxwniibbzaep` on a
+new machine), and after adding a migration:
+
+```bash
+supabase db push
+supabase gen types typescript --linked > src/lib/supabase/database.types.ts
+```
+
+## Idea board
+
+`/ideas` is open to anyone, with no sign-in. Visitors can add a name to what they
+post, or leave it blank and post as Anonymous. A random token in an httpOnly cookie
+identifies each browser, and it's used to keep votes to one per idea and to let
+people delete only what they posted. The tables allow no direct access; every read
+and write goes through security definer functions (`list_ideas`, `create_idea`,
+`set_vote`, and so on) that never return a token.
+
 ## Layout
 
 ```
 src/
   app/
     api/health/route.ts   deployment and Supabase status
+    ideas/                idea board: list, detail, server actions
     page.tsx              landing shell
-  lib/supabase/           browser client, server client, env guards
+  lib/supabase/           browser client, server client, env guards, DB types
+supabase/migrations/      schema and row level security
 ```

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export const dynamic = "force-dynamic";
@@ -35,10 +37,22 @@ export default function Home() {
         </p>
         <h1 className="text-4xl font-semibold tracking-tight">Hackathon shell</h1>
         <p className="text-black/60 dark:text-white/60">
-          Next.js on Vercel, deploying automatically from <code>main</code>. Nothing is
-          built on top of it yet.
+          Next.js on Vercel, deploying automatically from <code>main</code>.
         </p>
       </header>
+
+      <Link
+        href="/ideas"
+        className="flex items-center justify-between rounded-xl border border-black/10 px-5 py-4 transition-colors hover:border-black/30 dark:border-white/15 dark:hover:border-white/40"
+      >
+        <span>
+          <span className="block text-sm font-medium">Idea board</span>
+          <span className="block text-sm text-black/60 dark:text-white/60">
+            Submit ideas, vote for favorites, and discuss them with the team.
+          </span>
+        </span>
+        <span aria-hidden>→</span>
+      </Link>
 
       <ul className="rounded-xl border border-black/10 px-5 dark:border-white/15">
         <Check
