@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LogoMark } from "@/components/ui/logo";
 import { card, link } from "@/components/ui/styles";
+import { COMMUNITY_DOC_URL } from "@/components/devtools";
 import { DISCOURSE_URL } from "@/lib/discourse/connect";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -63,20 +64,20 @@ export default function Home() {
       </Link>
 
       {DISCOURSE_URL && (
-        <a
-          href={DISCOURSE_URL}
-          className={`${card} flex items-center justify-between px-sp-2.5 py-sp-2 transition-shadow hover:border-card-border-active hover:shadow-hover-large`}
-        >
-          <span>
-            <span className="block text-scale-4 font-semibold">Community</span>
-            <span className="block text-scale-3 text-text-medium">
-              A patient forum behind QuickMD sign-in, where everyone posts under a pseudonym.
-            </span>
+        <div className={`${card} space-y-sp-1 px-sp-2.5 py-sp-2`}>
+          <span className="block text-scale-4 font-semibold">Community</span>
+          <span className="block text-scale-3 text-text-medium">
+            A patient forum behind QuickMD sign-in, where everyone posts under a pseudonym.
           </span>
-          <span aria-hidden className="text-text-highlight">
-            →
+          <span className="flex flex-wrap gap-x-sp-2 text-scale-3">
+            <a className={link} href={DISCOURSE_URL}>
+              Open the forum →
+            </a>
+            <a className={link} href={COMMUNITY_DOC_URL} target="_blank" rel="noreferrer">
+              How it&apos;s wired
+            </a>
           </span>
-        </a>
+        </div>
       )}
 
       <ul className={`${card} px-sp-2.5`}>

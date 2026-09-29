@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Outfit, Poppins } from "next/font/google";
 
+import { DevToolsShell } from "@/components/devtools";
+
 import "./globals.css";
 
 // The QuickMD design system's font families. The variables are set on <html> because
@@ -18,7 +20,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${outfit.variable} ${poppins.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <DevToolsShell />
+      </body>
     </html>
   );
 }

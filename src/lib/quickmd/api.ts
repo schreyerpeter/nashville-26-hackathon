@@ -2,7 +2,12 @@ import { cookies } from "next/headers";
 
 // Patients sign in against the same patient-web API that doctorvisit.quick.md uses.
 // Point this at a dev environment, e.g. https://patient-web-api.gimli.quickmd.dev/
-const QUICKMD_API_URL = process.env.QUICKMD_API_URL ?? "";
+export const QUICKMD_API_URL = process.env.QUICKMD_API_URL ?? "";
+
+// The shared gimli test patient from patient-web's Playwright config, for DevTools' one-click
+// sign-in. Server-only, so the password never reaches the browser.
+export const DEMO_PATIENT_EMAIL = process.env.DEMO_PATIENT_EMAIL ?? "";
+export const DEMO_PATIENT_PASSWORD = process.env.DEMO_PATIENT_PASSWORD ?? "";
 
 // The Stytch session JWT the API hands back. It lives 60 minutes, so the cookie does too.
 const TOKEN_COOKIE = "qmd_patient_token";

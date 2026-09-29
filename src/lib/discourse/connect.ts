@@ -46,7 +46,7 @@ export function verifyRequest(sso: string | null, sig: string | null): ConnectRe
 }
 
 /** A stable handle that never reveals who the patient is, e.g. `patient-3f9a0c1d`. */
-function pseudonym(globalKey: string) {
+export function pseudonym(globalKey: string) {
   return `patient-${createHmac("sha256", SECRET).update(`username:${globalKey}`).digest("hex").slice(0, 8)}`;
 }
 

@@ -131,3 +131,21 @@ Login works without email. Only notifications and digests need it.
   - hidden group membership
   - email only through providers covered by a BAA
   - a legal review before any real patient is invited
+
+## DevTools (for demos)
+
+A floating panel, ported in slimmed-down form from the design system's DevTools
+(`features/devTools`), sits in the bottom-right corner of every page. It follows the same
+rules: it's on everywhere except production, where you open it with `?devTools=true`
+(remembered in localStorage) and turn it off with `?devTools=false`.
+
+- **Demo tab:** shows who the session cookie belongs to, with their pseudonym and groups.
+  It also has a one-click "Sign in as test patient" and short notes about gimli and
+  email verification.
+- **Environment tab:** the commit, the patient API, the Discourse URL, and whether the
+  DiscourseConnect secret is set.
+
+One-click sign-in uses `DEMO_PATIENT_EMAIL` and `DEMO_PATIENT_PASSWORD`. These are
+server-only, so the password never reaches the browser.
+
+A write-up with a sequence diagram is on the Community card, under "How it's wired".
