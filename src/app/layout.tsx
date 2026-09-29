@@ -11,8 +11,8 @@ const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"] });
 const poppins = Poppins({ variable: "--font-poppins-face", subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
-  title: "Nashville 26 Hackathon",
-  description: "Project shell for the Nashville 2026 hackathon.",
+  title: "QuickMD Community",
+  description: "A private community for QuickMD patients.",
 };
 
 export default function RootLayout({

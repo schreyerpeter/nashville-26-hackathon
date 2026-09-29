@@ -1,112 +1,67 @@
-import Link from "next/link";
-
 import { LogoMark } from "@/components/ui/logo";
-import { card, link } from "@/components/ui/styles";
-import { COMMUNITY_DOC_URL } from "@/components/devtools";
-import { DISCOURSE_URL } from "@/lib/discourse/connect";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { button, card } from "@/components/ui/styles";
+import { DISCOURSE_URL, pseudonym } from "@/lib/discourse/connect";
+import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
-type CheckState = "ok" | "pending";
+const promises = [
+  {
+    title: "Only patients get in",
+    body: "You sign in with your QuickMD account, so everyone here is a QuickMD patient.",
+  },
+  {
+    title: "No real names",
+    body: "You show up under a private username like patient-3f9a0c1d. Your name is never shared.",
+  },
+  {
+    title: "Your email stays private",
+    body: "Other members never see your email, and we don't look you up on Gravatar.",
+  },
+];
 
-function Check({ label, state, note }: { label: string; state: CheckState; note: string }) {
-  return (
-    <li className="flex items-start gap-sp-1.5 border-b border-border-medium py-sp-2 last:border-0">
-      <span
-        aria-hidden
-        className={`mt-sp-0.75 size-2 shrink-0 rounded-full ${
-          state === "ok" ? "bg-seafoam-50" : "bg-amber-50"
-        }`}
-      />
-      <span className="flex-1">
-        <span className="block text-scale-3 font-semibold">{label}</span>
-        <span className="block text-scale-3 text-text-medium">{note}</span>
-      </span>
-      <span
-        className={`text-scale-2 font-semibold uppercase ${
-          state === "ok" ? "text-text-success" : "text-text-warning"
-        }`}
-      >
-        {state === "ok" ? "ready" : "pending"}
-      </span>
-    </li>
-  );
-}
-
-export default function Home() {
-  const supabaseReady = isSupabaseConfigured();
+export default async function Home() {
+  const patient = await getSession();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center gap-sp-5 px-sp-2 py-sp-8">
       <header className="space-y-sp-1.5">
         <LogoMark className="mb-sp-3 h-12 w-auto" />
-        <p className="text-scale-2 font-semibold uppercase text-text-light">Nashville 2026</p>
-        <h1 className="text-scale-8 font-semibold">Hackathon shell</h1>
+        <p className="text-scale-2 font-semibold uppercase text-text-light">QuickMD Community</p>
+        <h1 className="text-scale-8 font-semibold">Talk with people on the same path</h1>
         <p className="text-scale-4 text-text-medium">
-          Next.js on Vercel, deploying automatically from <code>main</code>.
+          A private forum where QuickMD patients share what&apos;s working, ask questions, and
+          support each other.
         </p>
       </header>
 
-      <Link
-        href="/ideas"
-        className={`${card} flex items-center justify-between px-sp-2.5 py-sp-2 transition-shadow hover:border-card-border-active hover:shadow-hover-large`}
-      >
-        <span>
-          <span className="block text-scale-4 font-semibold">Idea board</span>
-          <span className="block text-scale-3 text-text-medium">
-            Submit ideas, vote for favorites, and discuss them with the team.
-          </span>
-        </span>
-        <span aria-hidden className="text-text-highlight">
-          →
-        </span>
-      </Link>
-
-      {DISCOURSE_URL && (
-        <div className={`${card} space-y-sp-1 px-sp-2.5 py-sp-2`}>
-          <span className="block text-scale-4 font-semibold">Community</span>
-          <span className="block text-scale-3 text-text-medium">
-            A patient forum behind QuickMD sign-in, where everyone posts under a pseudonym.
-          </span>
-          <span className="flex flex-wrap gap-x-sp-2 text-scale-3">
-            <a className={link} href={DISCOURSE_URL}>
-              Open the forum →
-            </a>
-            <a className={link} href={COMMUNITY_DOC_URL} target="_blank" rel="noreferrer">
-              How it&apos;s wired
-            </a>
-          </span>
+      {DISCOURSE_URL ? (
+        <div className="space-y-sp-1">
+          <a className={`${button()} w-full md:w-auto`} href={DISCOURSE_URL}>
+            {patient ? "Open the community" : "Join with your QuickMD account"}
+          </a>
+          {patient && (
+            <p className="text-scale-3 text-text-light">Signed in as {pseudonym(patient.globalKey)}</p>
+          )}
         </div>
+      ) : (
+        <p className={`${card} px-sp-2.5 py-sp-2 text-scale-3 text-text-medium`}>
+          Set DISCOURSE_URL to open the community.
+        </p>
       )}
 
-      <ul className={`${card} px-sp-2.5`}>
-        <Check
-          label="Next.js app router"
-          state="ok"
-          note="TypeScript, Tailwind, and ESLint are configured."
-        />
-        <Check
-          label="Continuous deployment"
-          state="ok"
-          note="Every push to main ships a production build."
-        />
-        <Check
-          label="Supabase"
-          state={supabaseReady ? "ok" : "pending"}
-          note={
-            supabaseReady
-              ? "Credentials are present and the client is wired up."
-              : "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to connect."
-          }
-        />
+      <ul className="grid gap-sp-2 md:grid-cols-3">
+        {promises.map(({ title, body }) => (
+          <li key={title} className={`${card} space-y-sp-0.5 px-sp-2.5 py-sp-2`}>
+            <span className="block text-scale-4 font-semibold">{title}</span>
+            <span className="block text-scale-3 text-text-medium">{body}</span>
+          </li>
+        ))}
       </ul>
 
       <p className="text-scale-3 text-text-light">
-        Live status:{" "}
-        <a className={link} href="/api/health">
-          /api/health
-        </a>
+        The community is for peer support, not medical advice. For questions about your care,
+        message your provider in the QuickMD app.
       </p>
     </main>
   );

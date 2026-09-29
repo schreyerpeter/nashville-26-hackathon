@@ -42,5 +42,3 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# supabase cli cache (per-machine link state)
-supabase/.temp/
