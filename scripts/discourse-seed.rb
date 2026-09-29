@@ -19,10 +19,10 @@ MEMBERS = %w[patient-5b21c7e0 patient-a93f0d42 patient-7e6d18bc patient-c04a9f31
 
 # QuickMD design-system colors (src/app/globals.css).
 CATEGORIES = [
-  { name: "Introductions", color: "178199", description: "New here? Say hello and share as much or as little as you like." },
-  { name: "Wins", color: "3FC2AB", description: "Milestones, big and small. Show up for each other." },
-  { name: "Visits and refills", color: "00A2B2", description: "Tips for video visits, refills, and the pharmacy. For questions about your own care, message your care team in the QuickMD app." },
-  { name: "Day to day", color: "F0B535", description: "Routines, rough patches, and what helps." },
+  { name: "Introductions", color: "178199", emoji: "wave", description: "New here? Say hello and share as much or as little as you like." },
+  { name: "Wins", color: "3FC2AB", emoji: "tada", description: "Milestones, big and small. Show up for each other." },
+  { name: "Visits and refills", color: "00A2B2", emoji: "speech_balloon", description: "Tips for video visits, refills, and the pharmacy. For questions about your own care, message your care team in the QuickMD app." },
+  { name: "Day to day", color: "F0B535", emoji: "sunrise", description: "Routines, rough patches, and what helps." },
 ]
 
 WELCOME = <<~MD
@@ -115,6 +115,71 @@ TOPICS = [
       { author: 2, raw: "Cooking something that takes a while. Chopping vegetables is weirdly calming." },
     ],
   },
+  {
+    category: "Wins",
+    author: 3,
+    days_ago: 2,
+    title: "Six weeks of showing up to every visit",
+    raw: <<~MD,
+      Small one, but it's mine: six weeks in a row, no missed or rescheduled visits.
+
+      What helped was putting the visit in my phone as a recurring event with a 30-minute alert, and setting out a glass of water and my notes before I sign on. It's a tiny ritual, and it makes the visit feel like something I'm doing for me.
+    MD
+    replies: [
+      { author: 0, raw: "Six weeks is a real streak. I love the ritual idea, stealing it." },
+      { author: 2, raw: "Congrats! The notes-ready trick is underrated." },
+      { author: 4, raw: "This made my morning. Keep going." },
+    ],
+  },
+  {
+    category: "Introductions",
+    author: 4,
+    days_ago: 4,
+    title: "Hello from someone who works nights",
+    raw: <<~MD,
+      Long-time lurker, first-time poster. I work overnight shifts, so my "morning" is your evening and most of my visits happen when everyone else is winding down.
+
+      Are there other night-shift folks here? Would love to hear how you fit the schedule around sleep.
+    MD
+    replies: [
+      { author: 1, raw: "Welcome! Overnight for two years here. I book my visits right after I wake up, before the day gets away from me." },
+      { author: 3, raw: "Not nights, but my hours are all over the place. Booking the same weekday and time each week made things click for me." },
+    ],
+  },
+  {
+    category: "Day to day",
+    author: 0,
+    days_ago: 6,
+    title: "Small routines that actually stuck",
+    raw: <<~MD,
+      I've tried a lot of big overhauls that lasted about four days. What's worked are the tiny ones: a glass of water when I wake up, ten minutes outside at lunch, and a text to one friend every night.
+
+      What's on your list of tiny things that stuck?
+    MD
+    replies: [
+      { author: 2, raw: "Making the bed. It sounds silly but it gives the day a first win." },
+      { author: 1, raw: "Music on while I cook dinner. That's it. That's the routine." },
+      { author: 4, raw: "Stretching for two minutes before I get out of bed. Zero willpower required." },
+    ],
+  },
+  {
+    category: "Visits and refills",
+    author: 1,
+    days_ago: 9,
+    title: "Your first video visit: what I wish I'd known",
+    raw: <<~MD,
+      For anyone nervous about their first video visit, here's what I'd tell my past self:
+
+      - Test your camera and sound five minutes early. The app walks you through it.
+      - Find a spot with decent light and a door that closes.
+      - Write down two or three things you want to talk about so you don't blank.
+      - It's a normal conversation. Your provider has seen it all.
+    MD
+    replies: [
+      { author: 3, raw: "The write-it-down tip is the one. I had a note open on my phone for my first three visits." },
+      { author: 0, raw: "Wish I'd read this a month ago. Sharing it with my sister who starts next week." },
+    ],
+  },
 ]
 
 def upload(filename, type)
@@ -157,12 +222,12 @@ scheme = ColorScheme.find_by(name: "QuickMD") || ColorScheme.create_from_base(
 Theme.find_by(id: SiteSetting.default_theme_id)&.update!(color_scheme_id: scheme.id)
 
 # The banner is capped at 180px and shows the whole post; this shows just the hero,
-# full width, with the welcome text left for the topic itself.
+# full width, with the welcome text left for the topic itself. Its rounded corners, shadow,
+# and where it shows live in discourse-theme/common/common.scss.
 BRANDING_CSS = <<~SCSS
   #banner { max-height: none; overflow: visible; padding: 0; background: transparent; position: relative; }
   #banner #banner-content > :not(.lightbox-wrapper) { display: none; }
   #banner .lightbox-wrapper, #banner .lightbox, #banner img { display: block; width: 100%; height: auto; }
-  #banner img { border-radius: 8px; }
   #banner .lightbox { pointer-events: none; }
   #banner .lightbox .meta { display: none; }
   #banner .floated-buttons { position: absolute; top: 8px; right: 8px; z-index: 1; }
@@ -211,6 +276,7 @@ categories = CATEGORIES.each_with_index.to_h do |attrs, position|
   category = Category.find_by(name: attrs[:name]) ||
     Category.create!(name: attrs[:name], color: attrs[:color], text_color: "FFFFFF", user: system, position: position)
   category.update!(description: attrs[:description]) if category.description.blank?
+  category.update!(style_type: :emoji, emoji: attrs[:emoji]) if attrs[:emoji] && category.emoji != attrs[:emoji]
   category.topic&.first_post&.then do |about|
     PostRevisor.new(about).revise!(system, { raw: attrs[:description] }, skip_validations: true) unless about.raw == attrs[:description]
   end
@@ -248,3 +314,16 @@ TOPICS.each do |t|
 end
 
 puts "Seeded #{created} new topic(s); #{TOPICS.size - created} already existed."
+
+# Engagement, so the forum reads as lived-in: views on every topic and a few likes on
+# each seeded post. Deterministic, and safe to re-run (a member can only like a post once).
+seeded_topics = Topic.where(user_id: members.map(&:id), deleted_at: nil).order(:id).to_a
+welcome&.update_columns(views: [welcome.views, 212].max)
+seeded_topics.each_with_index do |topic, i|
+  topic.update_columns(views: [topic.views, 18 + (i * 37) % 130].max)
+  topic.posts.order(:post_number).each do |post|
+    likers = members.reject { |m| m.id == post.user_id }.first(post.post_number == 1 ? 3 : 1 + (i + post.post_number) % 2)
+    likers.each { |m| PostActionCreator.like(m, post) }
+  end
+end
+puts "Added views and likes to #{seeded_topics.size} topic(s)."

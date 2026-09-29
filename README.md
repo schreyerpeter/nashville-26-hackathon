@@ -32,7 +32,8 @@ the come-back loop, retention data in Snowflake, and the demo script.
 
 The UI uses QuickMD's design system: its tokens are ported into
 `src/app/globals.css`, and shared pieces live in `src/components/ui/`. See
-[DESIGN.md](DESIGN.md) before building anything visible.
+[DESIGN.md](DESIGN.md) before building anything visible; it also sets the quality bar
+for how polished every screen and forum page should be.
 
 ## Deploys
 
@@ -49,8 +50,11 @@ src/
     community/login/      patient sign-in page and server actions
     page.tsx              patient landing page
   components/
+    community/            landing-page pieces (forum preview)
     devtools/             floating demo panel
-    ui/                   design-system class recipes and logo
+    ui/                   design-system class recipes, logo, and icons
+discourse-theme/          the forum's QuickMD theme (SCSS, footer, logos)
+scripts/                  local Discourse setup and seed content
   lib/
     discourse/            DiscourseConnect signing and pseudonyms
     quickmd/              patient-web API client
