@@ -21,7 +21,41 @@ IMAGE=discourse/discourse_dev:release
 # Like Discourse's d/exec, minus -it so it also works from scripts.
 dexec() { docker exec -u discourse:discourse -w /src "$NAME" "$@"; }
 
-env_value() { grep -E "^$1=" "$APP_DIR/.env.local" 2>/dev/null | tail -1 | cut -d= -f2-; }
+ENV_FILE="$APP_DIR/.env.local"
+env_value() { grep -E "^$1=" "$ENV_FILE" 2>/dev/null | tail -1 | cut -d= -f2-; }
+
+# Replaces or appends KEY=value in .env.local. Portable across BSD and GNU sed by not using sed.
+set_env() {
+  local tmp
+  tmp="$(mktemp)"
+  grep -v -E "^$1=" "$ENV_FILE" > "$tmp" 2>/dev/null || true
+  echo "$1=$2" >> "$tmp"
+  mv "$tmp" "$ENV_FILE"
+}
+
+# Starts .env.local from the template and fills in what setup can decide on its own.
+ensure_env() {
+  [ -f "$ENV_FILE" ] || { cp "$APP_DIR/.env.example" "$ENV_FILE"; echo "Created .env.local from .env.example."; }
+  [ -n "$(env_value QUICKMD_API_URL)" ] || set_env QUICKMD_API_URL "https://patient-web-api.gimli.quickmd.dev/"
+  [ -n "$(env_value DISCOURSE_URL)" ] || set_env DISCOURSE_URL "http://localhost:$PORT"
+  if [ -z "$(env_value DISCOURSE_CONNECT_SECRET)" ]; then
+    set_env DISCOURSE_CONNECT_SECRET "$(openssl rand -hex 32)"
+    echo "Generated DISCOURSE_CONNECT_SECRET in .env.local."
+  fi
+}
+
+preflight() {
+  if ! docker info >/dev/null 2>&1; then
+    echo "Docker isn't running. On a Mac: brew install colima docker && colima start --cpu 4 --memory 12 --disk 60" >&2
+    exit 1
+  fi
+  local mem
+  mem="$(docker info -f '{{.MemTotal}}')"
+  if [ "$mem" -lt 11000000000 ]; then
+    echo "Warning: Docker has $((mem / 1073741824)) GB of memory. Discourse's asset build needs about 12 GB;" >&2
+    echo "with less it gets killed and takes the server down. Colima: colima stop && colima start --memory 12" >&2
+  fi
+}
 
 ensure_source() {
   [ -d "$DISCOURSE_DIR" ] || git clone --depth 1 https://github.com/discourse/discourse.git "$DISCOURSE_DIR"
@@ -56,9 +90,11 @@ start_server() {
 }
 
 configure() {
-  local secret
+  ensure_env
+  local secret new_key=false
   secret="$(env_value DISCOURSE_CONNECT_SECRET)"
-  [ -n "$secret" ] || { echo "Set DISCOURSE_CONNECT_SECRET in .env.local first." >&2; exit 1; }
+  # A key's plaintext is only readable when it's created, so issue a fresh one if we don't have it.
+  [ -n "$(env_value DISCOURSE_API_KEY)" ] || new_key=true
 
   cat > "$DISCOURSE_DIR/tmp/qmd-setup.rb" <<RUBY
 admin = User.find_by_email("admin@localhost.test") || User.new(email: "admin@localhost.test", username: "qmd_admin")
@@ -96,9 +132,12 @@ group.save!
   enable_discourse_connect: true,
 }.each { |k, v| SiteSetting.set(k, v) }
 
-key = ApiKey.where(description: "Hackathon app: log patients out on sign-out").first ||
-  ApiKey.create!(description: "Hackathon app: log patients out on sign-out", created_by_id: Discourse::SYSTEM_USER_ID)
-puts "DISCOURSE_API_KEY=#{key.key}" if key.key_available?
+description = "Hackathon app: log patients out on sign-out"
+if $new_key || !ApiKey.exists?(description: description)
+  ApiKey.where(description: description).destroy_all
+  key = ApiKey.create!(description: description, created_by_id: Discourse::SYSTEM_USER_ID)
+  puts "DISCOURSE_API_KEY=#{key.key}"
+end
 RUBY
 
   local output
@@ -107,15 +146,16 @@ RUBY
   local api_key
   api_key="$(printf '%s\n' "$output" | grep '^DISCOURSE_API_KEY=' | cut -d= -f2- || true)"
   if [ -n "$api_key" ]; then
-    sed -i '' '/^DISCOURSE_API_KEY=/d' "$APP_DIR/.env.local"
-    echo "DISCOURSE_API_KEY=$api_key" >> "$APP_DIR/.env.local"
-    echo "Saved a new DISCOURSE_API_KEY to .env.local."
+    set_env DISCOURSE_API_KEY "$api_key"
+    echo "Saved a new DISCOURSE_API_KEY to .env.local. Restart npm run dev to pick it up."
   fi
   echo "Configured DiscourseConnect against $APP_URL."
 }
 
 case "${1:-}" in
   setup)
+    preflight
+    ensure_env
     ensure_source
     docker pull "$IMAGE"
     start_container
@@ -126,8 +166,8 @@ case "${1:-}" in
     configure
     start_server
     ;;
-  configure) configure ;;
-  start) start_container; start_server ;;
+  configure) preflight; configure ;;
+  start) preflight; start_container; start_server ;;
   stop)
     docker stop "$NAME" >/dev/null 2>&1 || true
     echo "Stopped."

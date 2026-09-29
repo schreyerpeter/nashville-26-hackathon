@@ -65,23 +65,26 @@ container, and this app runs beside it with `npm run dev`.
 
 **First time:**
 
-1. Fill in `.env.local`:
+1. `npm install`, then `scripts/discourse-local.sh setup`. Setup does the following:
+   - checks Docker is running and has enough memory
+   - creates `.env.local` from `.env.example` if it's missing, pointing at gimli and
+     `http://localhost:4200`, and generates `DISCOURSE_CONNECT_SECRET`
+   - clones Discourse to `~/quickmd/discourse` and starts the container
+   - installs gems and packages, and migrates the database
+   - applies the settings below and writes `DISCOURSE_API_KEY` into `.env.local`
+   - starts the server
 
-   | Variable | Value |
-   | --- | --- |
-   | `QUICKMD_API_URL` | `https://patient-web-api.gimli.quickmd.dev/`, which has the shared Playwright test patient |
-   | `DISCOURSE_URL` | `http://localhost:4200` |
-   | `DISCOURSE_CONNECT_SECRET` | `openssl rand -hex 32` |
-   | `DEMO_PATIENT_EMAIL`, `DEMO_PATIENT_PASSWORD` | optional; see `~/quickmd/patient-web/tests/.env.test.example` |
-
-2. Run `scripts/discourse-local.sh setup`. It clones Discourse to `~/quickmd/discourse`
-   and starts the container. It then installs gems and packages, migrates the database,
-   applies the settings below, starts the server, and writes `DISCOURSE_API_KEY` into
-   `.env.local`. Expect about 15 minutes the first time.
-3. Restart `npm run dev` so it picks up the API key.
+   Expect about 15 minutes the first time.
+2. Optional: for DevTools' one-click sign-in, add `DEMO_PATIENT_EMAIL` and
+   `DEMO_PATIENT_PASSWORD` to `.env.local`. Take them from
+   `~/quickmd/patient-web/tests/.env.test.example`. You can also type them into the
+   sign-in page.
+3. `npm run dev`, or restart it if it was already running, so it reads `.env.local`.
+   Then open http://localhost:3000.
 
 **After that:** `scripts/discourse-local.sh start`, `stop`, or `logs`. The database lives
-in `~/quickmd/discourse/data/postgres` and survives restarts.
+in `~/quickmd/discourse/data/postgres` and survives restarts. If `.env.local` loses its
+`DISCOURSE_API_KEY`, `scripts/discourse-local.sh configure` issues a new one.
 
 DiscourseConnect runs entirely through browser redirects, and Discourse never calls
 this app. The one server-to-server call goes the other way: when you sign out, the app

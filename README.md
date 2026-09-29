@@ -9,13 +9,16 @@ TypeScript, Tailwind) on Vercel, with continuous deployment from `main`.
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in the Discourse and patient API values
-scripts/discourse-local.sh setup   # first time; afterwards `scripts/discourse-local.sh start`
+scripts/discourse-local.sh setup   # first time (~15 min); afterwards `scripts/discourse-local.sh start`
 npm run dev
 ```
 
-The app runs at http://localhost:3000 and Discourse at http://localhost:4200. `/` is the patient landing page,
-`/community/login` is the sign-in page Discourse sends patients to, and
+Setup needs a Docker runtime with about 12 GB of memory (on a Mac: `brew install colima
+docker && colima start --cpu 4 --memory 12 --disk 60`), and creates `.env.local` for you.
+
+The app runs at http://localhost:3000 and Discourse at http://localhost:4200. `/` is
+the patient landing page, `/community/login` is the sign-in page Discourse sends
+patients to, and
 `/api/health` reports the environment, the deployed commit, and whether Discourse
 and the patient API are configured.
 
