@@ -1,47 +1,69 @@
-// QuickMD's design system on Discourse. Values come from ~/quickmd/design-system/src/theme
-// (the same tokens as src/app/globals.css); the color scheme in about.json carries the
-// palette, and this file carries type, shape, and the patient-web page chrome.
+/*
+ * QuickMD's design system on Discourse. Values come from ~/quickmd/design-system/src/theme
+ * (the same tokens as src/app/globals.css); the color scheme in about.json carries the
+ * palette, and this file carries type, shape, and the patient-web page chrome.
+ *
+ * Written as plain nested CSS (no Sass-only syntax) so it also runs as native CSS.
+ */
 
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap");
 
 :root {
-  // tailwind.config.ts: Outfit everywhere, two weights only
+  /* tailwind.config.ts: Outfit everywhere, two weights only */
   --font-family: "Outfit", sans-serif;
   --heading-font-family: "Outfit", sans-serif;
 
-  // borderRadius.ts: large (8px) for cards and inputs, pills for buttons
+  /* borderRadius.ts: large (8px) for inputs, larger (16px) for cards, pills for buttons */
   --d-border-radius: 8px;
   --d-border-radius-large: 16px;
   --d-button-border-radius: 768px;
   --d-input-border-radius: 8px;
   --d-nav-pill-border-radius: 768px;
 
-  // colors.ts: app background, borders, focus
+  /* colors.ts */
   --qmd-app-background: #eceff1;
+  --qmd-navy-80: #253845;
   --qmd-border-medium: #141e1f1a;
   --qmd-border-dark: #141e1f33;
   --qmd-border-darker: #141e1f66;
   --qmd-border-focus: #141e1f;
   --qmd-text-medium: #253845cc;
   --qmd-text-light: #253845b2;
+  --qmd-coastal-blue-5: #f3f9fa;
   --qmd-coastal-blue-10: #e8f2f5;
   --qmd-coastal-blue-20: #cee5ea;
+  --qmd-coastal-blue-30: #a2cdd6;
   --qmd-coastal-blue-40: #7fbac7;
   --qmd-coastal-blue-50: #178199;
   --qmd-coastal-blue-60: #166374;
   --qmd-coastal-blue-80: #154650;
+  --qmd-amber-10: #fdf8eb;
+  --qmd-amber-20: #fcefd5;
+  --qmd-amber-50: #f0b535;
+  --qmd-seafoam-50: #3fc2ab;
 
-  // boxShadow.ts
+  /* boxShadow.ts */
   --qmd-shadow-hover-small: 0 2px 4px 0 rgba(20, 30, 31, 0.1);
   --qmd-shadow-hover-large: 0px 4px 8px 0px rgba(20, 30, 31, 0.1);
+  --qmd-shadow-float-small: 0 8px 24px 0 rgba(20, 30, 31, 0.2);
+  --qmd-shadow-card: 0 1px 2px 0 rgba(20, 30, 31, 0.06), 0 1px 1px 0 rgba(20, 30, 31, 0.04);
+  --qmd-shadow-card-hover: 0 6px 20px 0 rgba(23, 129, 153, 0.16), 0 1px 3px 0 rgba(20, 30, 31, 0.08);
+
+  --qmd-card-radius: 16px;
 }
+
+/* ------------------------------------------------------------------ base */
 
 body {
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(1100px 420px at 50% -80px, #d3ebf0 0%, rgba(211, 235, 240, 0) 72%),
+    var(--qmd-app-background);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-// Only two weights in the design system.
 b,
 strong,
 h1,
@@ -58,32 +80,91 @@ h6,
   font-weight: 600;
 }
 
-// patient-web's MainNav bar: white, full logo, soft shadow instead of a border.
-.d-header {
-  box-shadow: var(--qmd-shadow-hover-large);
-  border-bottom: none;
+::selection {
+  background: var(--qmd-coastal-blue-20);
 }
 
-.d-header #site-logo {
-  max-height: 32px;
-}
-
-// Page background, with content sitting on white.
-body,
-#main-outlet-wrapper {
-  background: var(--qmd-app-background);
-}
-
+#main-outlet-wrapper,
 .sidebar-wrapper,
 .sidebar-container {
-  background: var(--qmd-app-background);
+  background: transparent;
+}
+
+/* --------------------------------------------------------------- header */
+
+/* patient-web's MainNav bar: white, full logo, soft shadow instead of a border. */
+.d-header {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  box-shadow: var(--qmd-shadow-hover-large);
+  border-bottom: none;
+
+  #site-logo {
+    max-height: 32px;
+  }
+
+  .icon,
+  .btn-flat {
+    border-radius: 50%;
+    transition: background-color 0.15s, color 0.15s;
+
+    &:hover {
+      background: var(--qmd-coastal-blue-10);
+    }
+  }
+
+  .d-icon {
+    color: var(--qmd-navy-80);
+  }
+
+  .icon:hover .d-icon {
+    color: var(--qmd-coastal-blue-50);
+  }
+}
+
+.d-header .avatar {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--qmd-coastal-blue-30);
+}
+
+/* --------------------------------------------------------------- sidebar */
+
+.sidebar-container {
+  padding-top: 8px;
+}
+
+.sidebar-section-header-text,
+.sidebar-section-header-caret {
+  color: var(--qmd-text-light);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .sidebar-section-link-wrapper .sidebar-section-link {
-  border-radius: 8px;
+  border-radius: 12px;
+  margin: 1px 8px;
+  padding: 8px 12px;
+  color: var(--qmd-navy-80);
+  transition: background-color 0.15s, color 0.15s;
+
+  .sidebar-section-link-prefix {
+    color: var(--qmd-text-light);
+
+    .d-icon {
+      color: var(--qmd-text-light);
+    }
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--qmd-coastal-blue-60);
+  }
 
   &.active {
-    background: var(--qmd-coastal-blue-10);
+    background: #fff;
+    box-shadow: var(--qmd-shadow-hover-small);
     color: var(--qmd-coastal-blue-50);
     font-weight: 600;
 
@@ -93,64 +174,636 @@ body,
   }
 }
 
-.topic-list,
-.category-list,
-.latest-topic-list,
-.user-content,
-.topic-body,
-.topic-avatar,
-.post-stream .topic-post .row,
-.list-controls + .contents,
-.discovery-list-container-top-outlet + *,
-.admin-contents {
-  background: var(--secondary);
+.sidebar-footer-wrapper {
+  background: transparent;
+
+  &::before,
+  .sidebar-footer-container::before {
+    display: none;
+  }
+
+  .sidebar-footer-container {
+    background: transparent;
+  }
 }
 
-.list-container .topic-list,
-.category-list {
+/* ---------------------------------------------------------- hero banner */
+
+/* The hero belongs on the home and categories pages, not above every thread. */
+body:not(.welcome-banner--visible) #banner {
+  display: none;
+}
+
+#banner {
+  margin-bottom: 8px;
+
+  img {
+    border-radius: var(--qmd-card-radius);
+    box-shadow: var(--qmd-shadow-float-small);
+  }
+
+  .lightbox-wrapper {
+    line-height: 0;
+  }
+}
+
+/* ------------------------------------------------------- welcome / search */
+
+.welcome-banner {
+  margin: 16px 0 24px;
+
+  .welcome-banner__wrap {
+    display: grid;
+    gap: 16px;
+    justify-items: start;
+    padding: 8px 0 16px;
+    text-align: left;
+  }
+
+  .welcome-banner__title {
+    color: var(--qmd-navy-80);
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 44px;
+    margin: 0;
+    text-align: left;
+
+    &::before {
+      content: "\1F44B";
+      display: inline-block;
+      margin-right: 10px;
+      transform-origin: 70% 70%;
+      animation: qmd-wave 2.4s ease-in-out 0.6s 1;
+    }
+  }
+
+  .search-menu {
+    margin: 0;
+    max-width: 560px;
+    width: 100%;
+  }
+
+  .search-input--welcome-banner,
+  .search-menu .search-input {
+    border-radius: 768px;
+    background: #fff;
+    border: 1px solid var(--qmd-border-medium);
+    box-shadow: var(--qmd-shadow-hover-small);
+    transition: box-shadow 0.15s, border-color 0.15s;
+
+    &:hover {
+      border-color: var(--qmd-coastal-blue-40);
+      box-shadow: var(--qmd-shadow-hover-large);
+    }
+
+    &:focus-within {
+      border-color: var(--qmd-coastal-blue-50);
+      box-shadow: 0 0 0 3px var(--qmd-coastal-blue-20);
+    }
+
+    input {
+      border: none;
+      box-shadow: none;
+      background: transparent;
+
+      &:hover,
+      &:focus {
+        border: none;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+@keyframes qmd-wave {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  10%, 30% { transform: rotate(14deg); }
+  20%, 40% { transform: rotate(-8deg); }
+  50% { transform: rotate(10deg); }
+}
+
+/* --------------------------------------------------- list nav (filters) */
+
+.list-controls {
+  margin-top: 8px;
+}
+
+.navigation-container {
+  align-items: center;
+}
+
+/* Category and tag filters: quiet pills instead of boxed selects. */
+.category-breadcrumb .select-kit-header,
+.list-controls .select-kit .select-kit-header {
+  background: #fff;
   border: 1px solid var(--qmd-border-medium);
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: 768px;
+  color: var(--qmd-navy-80);
+  padding: 8px 16px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: var(--qmd-coastal-blue-40);
+    box-shadow: var(--qmd-shadow-hover-small);
+  }
 }
 
-.topic-list .topic-list-item:hover {
-  background: #f3f9fa;
+/* Nav pills (Latest / New / Top): Tabset look, an underline instead of a filled pill. */
+.nav-pills > li > a {
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  font-weight: 600;
+  color: var(--qmd-text-medium);
+  padding: 10px 12px;
+  transition: color 0.15s, border-color 0.15s;
+
+  &.active,
+  &.active:hover {
+    background: transparent;
+    color: var(--qmd-coastal-blue-50);
+    border-bottom-color: var(--qmd-coastal-blue-50);
+  }
+
+  &:hover {
+    background: transparent;
+    color: var(--qmd-coastal-blue-50);
+    border-bottom-color: var(--qmd-coastal-blue-30);
+  }
+}
+
+/* ---------------------------------------------------------- topic list */
+
+/* Each topic is its own card, so the feed reads like a stream of conversations. */
+.topic-list {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  background: transparent;
+  border: none;
+  margin-top: 4px;
+
+  .topic-list-header th {
+    background: transparent;
+    border: none;
+    color: var(--qmd-text-light);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 4px 16px;
+    text-transform: uppercase;
+
+    button {
+      color: inherit;
+      font-weight: 600;
+    }
+  }
+
+  .topic-list-item {
+    td {
+      background: #fff;
+      border-top: 1px solid var(--qmd-border-medium);
+      border-bottom: 1px solid var(--qmd-border-medium);
+      padding: 18px 8px;
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+
+    td:first-child {
+      border-left: 1px solid var(--qmd-border-medium);
+      border-radius: var(--qmd-card-radius) 0 0 var(--qmd-card-radius);
+      padding-left: 20px;
+    }
+
+    td:last-child {
+      border-right: 1px solid var(--qmd-border-medium);
+      border-radius: 0 var(--qmd-card-radius) var(--qmd-card-radius) 0;
+      padding-right: 20px;
+    }
+
+    &:hover td {
+      background: var(--qmd-coastal-blue-5);
+      border-color: var(--qmd-coastal-blue-30);
+    }
+
+    /* Pinned topics get a warm amber wash. */
+    &.pinned td {
+      background: var(--qmd-amber-10);
+      border-color: var(--qmd-amber-20);
+    }
+
+    &.pinned:hover td {
+      background: var(--qmd-amber-20);
+      border-color: var(--qmd-amber-50);
+    }
+
+    .link-top-line {
+      display: block;
+      line-height: 1.35;
+    }
+
+    a.title {
+      color: var(--qmd-navy-80);
+      font-size: 19px;
+      line-height: 1.35;
+
+      &:hover {
+        color: var(--qmd-coastal-blue-50);
+      }
+
+    }
+
+    &.visited a.title {
+      color: var(--qmd-text-medium);
+    }
+
+    .link-bottom-line {
+      margin-top: 8px;
+    }
+
+    .topic-excerpt {
+      color: var(--qmd-text-medium);
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .topic-status .d-icon-thumbtack {
+      color: var(--qmd-amber-50);
+    }
+
+    /* Posters: overlapping avatars with a white ring. */
+    .posters {
+      white-space: nowrap;
+
+      a {
+        display: inline-block;
+
+        + a {
+          margin-left: -10px;
+        }
+      }
+
+      .avatar {
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px #fff;
+        height: 30px;
+        width: 30px;
+      }
+    }
+
+    .num {
+      color: var(--qmd-text-light);
+      font-size: 15px;
+
+      .number,
+      .post-count {
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.topic-list .topic-list-data,
+.topic-meta-data .post-infos {
+  color: var(--qmd-text-light);
+}
+
+/* ----------------------------------------------------------- category chips */
+
+/* A soft tint of each category's color with a dot, instead of a hard solid square. */
+.badge-category__wrapper {
+  --chip: var(--category-badge-color, var(--qmd-coastal-blue-50));
+
+  .badge-category {
+    align-items: center;
+    background: color-mix(in srgb, var(--chip) 13%, #fff);
+    border: 1px solid color-mix(in srgb, var(--chip) 28%, #fff);
+    border-radius: 768px;
+    color: var(--qmd-navy-80);
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 600;
+    gap: 6px;
+    padding: 2px 12px 2px 8px;
+
+    &.--style-square::before,
+    &.--style-icon::before {
+      background: var(--chip);
+      border-radius: 50%;
+      content: "";
+      display: inline-block;
+      height: 8px;
+      width: 8px;
+    }
+
+    &.--style-emoji .emoji {
+      height: 16px;
+      width: 16px;
+    }
+
+    .badge-category__name {
+      color: var(--qmd-navy-80);
+    }
+  }
+}
+
+.discourse-tag.box {
+  border-radius: 768px;
+}
+
+/* ------------------------------------------------------------ categories page */
+
+.category-list {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  background: transparent;
+  border: none;
+
+  thead th {
+    background: transparent;
+    border: none;
+    color: var(--qmd-text-light);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  tbody tr {
+    td {
+      background: #fff;
+      border-top: 1px solid var(--qmd-border-medium);
+      border-bottom: 1px solid var(--qmd-border-medium);
+      padding: 20px;
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+
+    td:first-child {
+      border-left: 6px solid var(--category-badge-color, var(--qmd-coastal-blue-50));
+      border-radius: var(--qmd-card-radius) 0 0 var(--qmd-card-radius);
+    }
+
+    td:last-child {
+      border-right: 1px solid var(--qmd-border-medium);
+      border-radius: 0 var(--qmd-card-radius) var(--qmd-card-radius) 0;
+    }
+
+    &:hover td {
+      background: var(--qmd-coastal-blue-5);
+    }
+  }
+
+  .category-description {
+    color: var(--qmd-text-medium);
+    margin-top: 6px;
+  }
+
+  .category-name {
+    font-size: 19px;
+  }
+
+  .topics .value {
+    color: var(--qmd-navy-80);
+    font-size: 22px;
+    font-weight: 600;
+  }
+}
+
+.categories-and-latest .topic-list-item td {
+  padding: 14px 12px;
+}
+
+/* The "Latest" column beside the categories: the same cards, one per topic. */
+.latest-topic-list {
+  display: grid;
+  gap: 10px;
+
+  .table-heading {
+    color: var(--qmd-text-light);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0 4px;
+    text-transform: uppercase;
+  }
+
+  .latest-topic-list-item {
+    background: #fff;
+    border: 1px solid var(--qmd-border-medium);
+    border-radius: var(--qmd-card-radius);
+    padding: 14px 16px;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &:hover {
+      background: var(--qmd-coastal-blue-5);
+      border-color: var(--qmd-coastal-blue-30);
+    }
+
+    &.pinned {
+      background: var(--qmd-amber-10);
+      border-color: var(--qmd-amber-20);
+    }
+
+    .avatar {
+      border-radius: 50%;
+      height: 40px;
+      width: 40px;
+    }
+
+    a.title {
+      color: var(--qmd-navy-80);
+      font-size: 16px;
+    }
+
+    &.visited a.title {
+      color: var(--qmd-text-medium);
+    }
+  }
+}
+
+/* --------------------------------------------------------------- topic page */
+
+#topic-title {
+  padding-top: 24px;
+
+  h1 {
+    color: var(--qmd-navy-80);
+    font-size: 32px;
+    line-height: 44px;
+  }
+
+  .topic-category {
+    margin-top: 8px;
+  }
 }
 
 .topic-post article.boxed {
-  background: var(--secondary);
+  background: #fff;
   border: 1px solid var(--qmd-border-medium);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 8px;
+  border-radius: var(--qmd-card-radius);
+  box-shadow: var(--qmd-shadow-card);
+  margin-bottom: 12px;
+  padding: 20px 24px;
+
+  .topic-avatar {
+    border-top: none;
+  }
+
+  .topic-body {
+    border-top: none;
+  }
+
+  .avatar {
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--qmd-coastal-blue-20);
+  }
 }
 
-// Button.tsx: 44px pills, semibold, primary/secondary/tertiary.
+.topic-post.sticky-avatar .topic-avatar,
+.topic-post .topic-body {
+  border-top: none;
+}
+
+.topic-post:first-of-type article.boxed,
+.topic-post.topic-owner article.boxed {
+  border-color: var(--qmd-coastal-blue-20);
+}
+
+.topic-meta-data {
+  .names {
+    a {
+      color: var(--qmd-navy-80);
+    }
+
+    a:hover {
+      color: var(--qmd-coastal-blue-50);
+    }
+  }
+
+  .post-info a {
+    color: var(--qmd-text-light);
+  }
+}
+
+.cooked {
+  color: var(--qmd-navy-80);
+  font-size: 17px;
+  line-height: 1.65;
+
+  p {
+    margin: 0 0 1em;
+  }
+
+  /* Link.tsx: semibold with a quiet underline, for links inside posts. */
+  a:not(.mention):not(.hashtag-cooked):not(.lightbox) {
+    color: var(--qmd-navy-80);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--qmd-coastal-blue-30);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.15s, color 0.15s;
+
+    &:hover {
+      color: var(--qmd-coastal-blue-50);
+      text-decoration-color: var(--qmd-coastal-blue-50);
+    }
+  }
+
+  blockquote {
+    background: var(--qmd-coastal-blue-5);
+    border-left: 4px solid var(--qmd-coastal-blue-30);
+    border-radius: 0 12px 12px 0;
+    padding: 8px 16px;
+  }
+}
+
+/* Post actions: quiet until hovered. */
+.post-controls .btn,
+.topic-map .btn {
+  background: transparent;
+  border-color: transparent;
+  color: var(--qmd-text-light);
+
+  .d-icon {
+    color: var(--qmd-text-light);
+  }
+
+  &:hover {
+    background: var(--qmd-coastal-blue-10);
+    color: var(--qmd-coastal-blue-50);
+
+    .d-icon {
+      color: var(--qmd-coastal-blue-50);
+    }
+  }
+}
+
+.post-controls .like-count,
+.post-controls .has-like .d-icon,
+.post-controls .my-likes .d-icon {
+  color: #e45735;
+}
+
+.topic-footer-main-buttons {
+  margin: 20px 0 8px;
+}
+
+/* Timeline on the right of a topic. */
+.topic-timeline {
+  .timeline-scrollarea {
+    border-left-color: var(--qmd-coastal-blue-20);
+  }
+
+  .timeline-handle {
+    background: var(--qmd-coastal-blue-50);
+    border-radius: 4px;
+  }
+
+  .timeline-replies {
+    color: var(--qmd-navy-80);
+    font-weight: 600;
+  }
+
+  .timeline-footer-controls .btn {
+    box-shadow: var(--qmd-shadow-hover-small);
+  }
+}
+
+/* ------------------------------------------------------------------ buttons */
+
+/* Button.tsx: 44px pills, semibold, primary/secondary/tertiary. */
 .btn {
   border-radius: 768px;
   border: 1px solid transparent;
   font-weight: 600;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.1s;
 
   &:focus-visible {
     outline: none;
     border: 2px solid var(--qmd-border-focus);
+  }
+
+  &:active {
+    transform: translateY(1px);
   }
 }
 
 .btn-primary {
   background: var(--qmd-coastal-blue-50);
   border-color: var(--qmd-coastal-blue-50);
+  box-shadow: 0 1px 2px rgba(20, 30, 31, 0.12);
   color: #fff;
 
   .d-icon {
     color: #fff;
   }
 
-  .discourse-no-touch &:hover,
   &:hover {
     background: var(--qmd-coastal-blue-60);
     border-color: var(--qmd-coastal-blue-60);
+    box-shadow: 0 4px 12px rgba(23, 129, 153, 0.35);
     color: #fff;
   }
 
@@ -169,7 +822,6 @@ body,
     color: var(--qmd-coastal-blue-50);
   }
 
-  .discourse-no-touch &:hover,
   &:hover {
     background: var(--qmd-coastal-blue-20);
     color: var(--qmd-coastal-blue-50);
@@ -180,7 +832,7 @@ body,
   }
 }
 
-// Header icons and post controls stay tertiary: no fill, dark icon, blue on hover.
+/* Header icons and post controls stay tertiary: no fill, dark icon, blue on hover. */
 .d-header .btn,
 .d-header .icon,
 .post-controls .btn,
@@ -188,29 +840,12 @@ body,
 .btn-flat {
   background: transparent;
   border-color: transparent;
+  box-shadow: none;
 }
 
-// Nav pills (Latest / New / Top): Tabset look, an underline instead of a filled pill.
-.nav-pills > li > a {
-  border-radius: 0;
-  border-bottom: 2px solid transparent;
-  font-weight: 600;
-  color: var(--primary);
+/* ------------------------------------------------------------------- inputs */
 
-  &.active,
-  &.active:hover {
-    background: transparent;
-    color: var(--qmd-coastal-blue-50);
-    border-bottom-color: var(--qmd-coastal-blue-50);
-  }
-
-  &:hover {
-    background: transparent;
-    color: var(--qmd-coastal-blue-50);
-  }
-}
-
-// Input.tsx: 44px, rounded-large, darker border on hover, inset focus ring.
+/* Input.tsx: 44px, rounded-large, darker border on hover, inset focus ring. */
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -235,30 +870,106 @@ textarea,
   }
 }
 
-// Link.tsx: semibold with a quiet underline, for links inside posts.
-.cooked a:not(.mention):not(.hashtag-cooked):not(.lightbox) {
-  font-weight: 600;
-  color: var(--primary);
-  text-decoration: underline;
-  text-decoration-color: var(--qmd-border-dark);
-  text-underline-offset: 4px;
+/* ----------------------------------------------------------- composer + menus */
+
+#reply-control {
+  border-radius: var(--qmd-card-radius) var(--qmd-card-radius) 0 0;
+  box-shadow: 0 -8px 32px rgba(20, 30, 31, 0.18);
+  overflow: hidden;
 }
 
-// Badges and category chips: pill shape.
-.badge-category__wrapper .badge-category,
-.discourse-tag.box {
-  border-radius: 768px;
+.d-modal__container,
+.user-card,
+.group-card {
+  border-radius: var(--qmd-card-radius);
+  box-shadow: var(--qmd-shadow-float-small);
 }
 
-.topic-list .topic-list-data,
-.topic-meta-data .post-infos,
-.topic-list .posters,
-.topic-list .num {
-  color: var(--qmd-text-light);
+.fk-d-menu,
+.menu-panel,
+.select-kit-body {
+  border-radius: 12px;
+  border: 1px solid var(--qmd-border-medium);
+  box-shadow: var(--qmd-shadow-float-small);
+  overflow: hidden;
 }
 
-// Modals: rounded-larger like Alert, soft float shadow.
-.d-modal__container {
-  border-radius: 16px;
-  box-shadow: 0 8px 24px 0 rgba(20, 30, 31, 0.2);
+/* ------------------------------------------------------------------ footer */
+
+.powered-by-discourse {
+  opacity: 0.7;
+}
+
+.qmd-safety-strip {
+  align-items: center;
+  background: #fff;
+  border-top: 1px solid var(--qmd-border-medium);
+  color: var(--qmd-text-medium);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 14px;
+  gap: 4px 16px;
+  justify-content: center;
+  margin-top: 32px;
+  padding: 16px 24px;
+  text-align: center;
+
+  strong {
+    color: var(--qmd-navy-80);
+  }
+
+  a {
+    color: var(--qmd-coastal-blue-50);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--qmd-coastal-blue-30);
+    text-underline-offset: 3px;
+  }
+}
+
+/* ----------------------------------------------------------------- mobile */
+
+@media (max-width: 700px) {
+  .welcome-banner .welcome-banner__title {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  #topic-title h1 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .topic-list .topic-list-item {
+    td:first-child {
+      padding-left: 14px;
+    }
+
+    td:last-child {
+      padding-right: 14px;
+    }
+
+    a.title {
+      font-size: 17px;
+    }
+  }
+
+  .topic-post article.boxed {
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .cooked {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-banner .welcome-banner__title::before {
+    animation: none;
+  }
+
+  .btn {
+    transition: none;
+  }
 }

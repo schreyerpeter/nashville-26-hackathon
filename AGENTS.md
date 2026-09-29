@@ -16,3 +16,15 @@ Every page and component in this app must use QuickMD's design system. Before bu
 - Reuse `button()`, `field`, `card`, `link` and `LogoMark` from `src/components/ui/` before writing new classes.
 - No raw hex, no arbitrary values like `text-[16px]`, no `dark:` variants.
 - If you need a missing token or component, port it from the design-system repo rather than approximating it.
+
+# Keep the bar high
+
+Using the tokens is the minimum. This community should look polished and feel warm, on the
+landing page, sign-in, and every page of the forum (`discourse-theme/`). Before you say UI
+work is done, run it, screenshot it at 1440 and 390 wide, and read the screenshots. Give
+pages a clear hierarchy, depth (soft gradients, shadows, rounded cards), real content, and
+responsive layouts; don't ship a flat, unstyled, or half-finished screen, and don't remove the
+988 / peer-support safety copy. The full checklist is "The quality bar" in
+[DESIGN.md](DESIGN.md). For the forum, edit `discourse-theme/common/common.scss`, run
+`scripts/discourse-local.sh theme`, and keep `scripts/discourse-seed.rb` rich enough that the
+forum never looks empty.

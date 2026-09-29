@@ -79,6 +79,40 @@ If a design-system component you need isn't here yet, port its classes from
 `~/quickmd/design-system/src/components/<group>/<Name>/<Name>.tsx` into
 `src/components/ui/`, rather than approximating it inline.
 
+## The quality bar
+
+Matching the tokens is the floor, not the goal. Every screen in this app, and every page of
+the forum, should look finished enough to demo to a patient or an investor today. Before you
+call UI work done, hold it to this:
+
+- **Look at it.** Run it, open it in a browser, and screenshot it at desktop (1440 wide) and
+  phone (390 wide). Read the screenshots. Type-checking a page doesn't tell you how it looks.
+  Check the empty, loading, error, and hover/focus states too, not only the happy path.
+- **Set up a hierarchy.** One clear focal point per screen. A big semibold headline
+  (`text-scale-8` and up on marketing-style pages), a `text-scale-5` lead paragraph in
+  `text-text-medium`, then the action. Never a wall of same-sized text.
+- **Give pages depth, not flat gray.** Hero sections sit on a soft token gradient
+  (`bg-linear-to-b from-coastal-blue-10 via-frost-20 to-app-background`), cards get
+  `rounded-large` or `rounded-larger` with `shadow-hover-small`, and floating things get
+  `shadow-float-small`. The faint QuickMD mark (`LogoMark`, `opacity-5` to `opacity-10`) is the
+  brand's watermark.
+- **Show the product.** Prefer a picture of the real thing (see `ForumPreview`) over a
+  paragraph describing it. Use the real seeded content, not lorem ipsum.
+- **Use icons and emoji with intent.** Line icons come from `icons.tsx` and are drawn in
+  `currentColor`; add to it rather than pulling in a library. Community categories keep the
+  same emoji everywhere (Introductions 👋, Wins 🎉, Visits and refills 💬, Day to day 🌅).
+- **Make it feel alive.** Interactive things respond: color and shadow transitions on hover,
+  a 1px press on buttons, visible focus rings. Keep motion small, and honour
+  `prefers-reduced-motion`.
+- **Make it responsive.** Stack at phone width, use the `md:` and `lg:` breakpoints, and keep
+  tap targets at 44px (32px only for the small button).
+- **Write like a person.** Warm, plain, short copy in QuickMD's voice: second person, no
+  jargon, no exclamation-point overload. Curly apostrophes in headlines (`&rsquo;`).
+- **Keep safety visible.** The peer-support disclaimer and the 988/911 line show on the
+  landing page and in the forum footer. Don't remove or bury them for a cleaner look.
+- **Don't regress a screen you didn't set out to change.** If you touch shared classes
+  (`styles.ts`, the theme), look at every screen that uses them.
+
 ## Rules
 
 - **Tokens only.** No raw hex, `rgb()`, or arbitrary values (`text-[16px]`, `p-[13px]`,
@@ -96,9 +130,40 @@ If a design-system component you need isn't here yet, port its classes from
 
 ## The forum (Discourse)
 
-`discourse-theme/` is the same design system as a Discourse theme: the palette as a color
-scheme in `about.json`, and Outfit, pill buttons, 8px cards, the Tabset-style nav, and the
-input states in `common/common.scss`, plus the logo SVGs. `scripts/discourse-local.sh
-setup` installs it; after editing it, run `scripts/discourse-local.sh theme` to reapply.
-Hex values are allowed there (Discourse has no Tailwind), but copy them from
-`globals.css` rather than inventing new ones.
+`discourse-theme/` is the same design system as a Discourse theme, and it is held to the
+same quality bar as the app. `about.json` carries the palette as a color scheme;
+`common/common.scss` carries Outfit, pill buttons, and the page chrome; `common/footer.html`
+adds the safety strip under every page; `assets/` has the logo SVGs.
+
+What the theme does today, so you extend it instead of redoing it:
+
+- Page: a soft teal wash over the app background, a frosted sticky header, and a sidebar
+  with white pill-style active links.
+- Topic lists and the categories page: one white 16px card per topic or category, a colored
+  left edge on categories, an amber wash on pinned topics, overlapping avatars with a white
+  ring, and a two-line excerpt.
+- Category badges: a pill tinted from each category's own color (`color-mix`), with an emoji.
+- Topic page: a card per post, larger reading text, quiet post actions, and a big title.
+- Hero banner (the welcome topic): rounded, with a float shadow, and shown only where
+  `body.welcome-banner--visible` is set (home and categories), not above every thread.
+- Welcome greeting with a pill search box, pill filters, underline nav, and 8px inputs.
+
+Rules for editing it:
+
+- **Reapply and look.** After editing, run `scripts/discourse-local.sh theme` (about 6
+  seconds), then screenshot home, `/categories`, a category, and a topic at 1440 and 390
+  wide. Sign in for those with a throwaway SSO login; don't touch a real account.
+- **Plain nested CSS.** Write `common.scss` with `/* */` comments and no Sass-only syntax, so
+  the same file also runs as native CSS. That lets you paste it into a page's `<style>` for
+  a quick try before reinstalling.
+- **Hex is allowed here** (Discourse has no Tailwind), but copy values from `globals.css`
+  into the `--qmd-*` variables at the top and use those, rather than inventing colors.
+- **Data has to look lived-in.** An empty forum looks dead. `scripts/discourse-seed.rb`
+  seeds members, category emoji, topics with replies, views, and likes. Add to it when a
+  new screen needs content to look right, and keep it re-runnable. Its copy follows the
+  seed's rules: no doses or specific medications, no crisis language, no outcome promises.
+- **Discourse changes fast.** Selectors here were checked against the current dev build.
+  If one stops matching after an upgrade, inspect the DOM and fix the selector rather than
+  adding `!important`.
+- The seed's `QuickMD branding` component only holds the functional banner CSS. Put
+  anything decorative in `common.scss`.

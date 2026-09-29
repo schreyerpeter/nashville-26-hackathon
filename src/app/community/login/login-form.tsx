@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
+import { EyeIcon } from "@/components/ui/icons";
 import { button, errorMessage, field, formField, label } from "@/components/ui/styles";
 
 import { signIn, type FormState } from "./actions";
@@ -13,6 +14,7 @@ const initialState: FormState = { error: null };
 export function LoginForm({ sso, sig }: { sso: string; sig: string }) {
   const [state, action, pending] = useActionState(signIn, initialState);
   const invalid = state.error ? true : undefined;
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form action={action} className="grid gap-sp-2">
@@ -45,18 +47,29 @@ export function LoginForm({ sso, sig }: { sso: string; sig: string }) {
             {state.error}
           </p>
         )}
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          autoComplete="current-password"
-          placeholder="Enter your password"
-          aria-invalid={invalid}
-          aria-describedby={invalid && "password-error"}
-          disabled={pending}
-          className={field}
-        />
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            required
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            aria-invalid={invalid}
+            aria-describedby={invalid && "password-error"}
+            disabled={pending}
+            className={`${field} pr-sp-6`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((shown) => !shown)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+            className="absolute inset-y-0 right-0 grid w-sp-6 cursor-pointer place-items-center rounded-r-large text-text-medium transition-colors hover:text-text-highlight focus-visible:outline-2 focus-visible:outline-border-focus"
+          >
+            <EyeIcon off={showPassword} className="size-5" />
+          </button>
+        </div>
       </div>
 
       <button
