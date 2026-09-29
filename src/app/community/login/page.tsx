@@ -5,8 +5,10 @@ import { Logo, LogoMark } from "@/components/ui/logo";
 import { banner, heading, paragraph } from "@/components/ui/styles";
 import { isDiscourseConfigured } from "@/lib/discourse/connect";
 import { isQuickmdConfigured } from "@/lib/quickmd/api";
+import { getSession, hasAcceptedTerms } from "@/lib/session";
 
 import { LoginForm } from "./login-form";
+import { TermsModal } from "./terms-modal";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,11 @@ export default async function CommunityLogin({ searchParams }: PageProps<"/commu
   const { sso, sig } = await searchParams;
   const ready = isDiscourseConfigured() && isQuickmdConfigured();
   const setup = banner("warning");
+  const signedIn = banner("informative");
+  const patient = await getSession();
+  // Signed in but new here: agree to the terms before the handshake goes back to the forum.
+  const needsTerms = patient !== null && !(await hasAcceptedTerms(patient));
+  const params = { sso: typeof sso === "string" ? sso : "", sig: typeof sig === "string" ? sig : "" };
 
   // patient-web's AuthLayout: one white card, centered, with the full logo on top. The
   // backdrop and the reassurance row underneath are ours.
@@ -42,8 +49,14 @@ export default async function CommunityLogin({ searchParams }: PageProps<"/commu
             </p>
           </div>
 
-          {ready ? (
-            <LoginForm sso={typeof sso === "string" ? sso : ""} sig={typeof sig === "string" ? sig : ""} />
+          {needsTerms ? (
+            // Behind the terms popup, so there's no sign-in form for someone already signed in.
+            <div className={signedIn.box}>
+              <p className={signedIn.title}>You&apos;re signed in</p>
+              <p className={signedIn.text}>Agree to the terms to open QuickMD Together.</p>
+            </div>
+          ) : ready ? (
+            <LoginForm {...params} />
           ) : (
             <div className={setup.box}>
               <p className={setup.title}>Sign-in isn&apos;t set up yet</p>
@@ -64,6 +77,7 @@ export default async function CommunityLogin({ searchParams }: PageProps<"/commu
           ))}
         </ul>
       </div>
+      {needsTerms && <TermsModal {...params} />}
     </main>
   );
 }

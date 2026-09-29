@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { signInAsDemoPatient } from "@/app/community/login/actions";
 import { button, card, link, tab as tabClass, tablist } from "@/components/ui/styles";
 
-import { getDevToolsSession, type Session } from "./actions";
+import { getDevToolsSession, resetTermsConsent, type Session } from "./actions";
 
 // A slimmed-down port of the design system's DevTools (features/devTools): the same
 // floating panel, with a Demo tab in place of the console, network, and storage panels,
@@ -98,6 +98,10 @@ function DemoTab({ forumUrl, docUrl, mailUrl, demoPatientEmail, environment }: D
   }, []);
   useEffect(refresh, [refresh]);
 
+  function showTermsAgain() {
+    startTransition(() => resetTermsConsent());
+  }
+
   function signInAsTestPatient() {
     // On the sign-in page, finish the handshake Discourse started; anywhere else, open the forum.
     const params = new URLSearchParams(window.location.search);
@@ -139,6 +143,24 @@ function DemoTab({ forumUrl, docUrl, mailUrl, demoPatientEmail, environment }: D
             Refresh
           </button>
         </div>
+      </Section>
+
+      <Section title="Terms">
+        <p className="text-text-medium">
+          {session?.signedIn
+            ? session.acceptedTerms
+              ? "Agreed in this browser."
+              : "Not agreed yet. Opening the forum shows the terms."
+            : "Sign in to see the terms before the forum opens."}
+        </p>
+        <button
+          type="button"
+          onClick={showTermsAgain}
+          disabled={pending}
+          className={`${button("secondary", "s")} w-full`}
+        >
+          Clear consent and show the terms
+        </button>
       </Section>
 
       <Section title="Test patient">

@@ -4,7 +4,7 @@ import { LogoMark } from "@/components/ui/logo";
 import { banner, button, card, heading, label, paragraph } from "@/components/ui/styles";
 import { TopNav } from "@/components/ui/top-nav";
 import { DISCOURSE_URL, pseudonym } from "@/lib/discourse/connect";
-import { getSession } from "@/lib/session";
+import { getSession, hasAcceptedTerms } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +61,9 @@ const steps = [
 
 export default async function Home() {
   const patient = await getSession();
+  // The forum keeps its own login, so a patient signed in there would never meet the terms
+  // on the way in. Send anyone who hasn't agreed through the sign-in page, which asks.
+  const forumHref = patient && !(await hasAcceptedTerms(patient)) ? "/community/login" : DISCOURSE_URL;
   const cta = patient ? "Open QuickMD Together" : "Join with your QuickMD account";
   const notice = banner("informative");
   const setup = banner("warning");
@@ -69,7 +72,7 @@ export default async function Home() {
     <>
       <TopNav>
         {DISCOURSE_URL && (
-          <a className={button(patient ? "primary" : "secondary", "s")} href={DISCOURSE_URL}>
+          <a className={button(patient ? "primary" : "secondary", "s")} href={forumHref}>
             {patient ? "Open QuickMD Together" : "Log in"}
           </a>
         )}
@@ -100,7 +103,7 @@ export default async function Home() {
 
               {DISCOURSE_URL ? (
                 <div className="grid justify-items-start gap-sp-1.5">
-                  <a className={`${button("primary", "m")} group w-full gap-sp-1 md:w-auto`} href={DISCOURSE_URL}>
+                  <a className={`${button("primary", "m")} group w-full gap-sp-1 md:w-auto`} href={forumHref}>
                     {cta}
                     <ArrowRightIcon className="size-5 transition-transform group-hover:translate-x-sp-0.5" />
                   </a>
