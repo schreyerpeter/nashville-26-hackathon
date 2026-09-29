@@ -15,6 +15,12 @@ npm run dev
 The app runs at http://localhost:3000. `/ideas` is the team idea board, and `/api/health` reports the environment, the
 deployed commit, and whether Supabase is reachable.
 
+## Design
+
+The UI uses QuickMD's design system: its tokens are ported into
+`src/app/globals.css`, and shared pieces live in `src/components/ui/`. See
+[DESIGN.md](DESIGN.md) before building anything visible.
+
 ## Deploys
 
 Pushing to `main` builds and promotes to production. Pushing any other branch

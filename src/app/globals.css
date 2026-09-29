@@ -1,26 +1,336 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * QuickMD design-system tokens, ported from ~/quickmd/design-system/src/theme/.
+ * Class names match the ones QuickMD apps use (bg-coastal-blue-50, text-text-dark,
+ * border-border-medium, rounded-large, shadow-hover-small, …). See DESIGN.md.
+ *
+ * Values are copied verbatim. When a design needs a token that isn't here, copy
+ * it from the design-system source rather than approximating it.
+ */
+@theme {
+  /* Tailwind's default palette is removed so only QuickMD colors generate. */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* colors.ts: marketingColors */
+  --color-marketing-deep-navy: #253746;
+  --color-marketing-coral: #ec6c58;
+  --color-marketing-sunset: #ffa07a;
+  --color-marketing-coastal-blue: #0097a9;
+  --color-marketing-emerald: #006269;
+  --color-marketing-amber: #f1b434;
+  --color-marketing-lagoon: #4fc7ea;
+  --color-marketing-seafoam: #40c1ac;
+  --color-marketing-sunny-yellow: #f3cf4e;
+
+  /* colors.ts: primary */
+  --color-primary-white: #ffffff;
+  --color-primary-deep: #213e71;
+  --color-primary-coastal-blue: #00a2b2;
+  --color-primary-emerald: #44b85e;
+  --color-primary-seafoam: #73ccd5;
+  --color-primary-amber: #f0b535;
+  --color-primary-frost: #c9ebef;
+  --color-primary-sand: #fff3d8;
+  --color-primary-red: #cb4d25;
+
+  --color-deep-navy-5: #f6f7f8;
+  --color-deep-navy-10: #eceff1;
+  --color-deep-navy-20: #d8dee2;
+  --color-deep-navy-30: #b4c0c9;
+  --color-deep-navy-40: #98a9b4;
+  --color-deep-navy-50: #436277;
+  --color-deep-navy-60: #354e5c;
+  --color-deep-navy-70: #2c404b;
+  --color-deep-navy-80: #253845;
+  --color-deep-navy-90: #1d2c31;
+  --color-deep-navy-95: #172325;
+
+  --color-coastal-blue-5: #f3f9fa;
+  --color-coastal-blue-10: #e8f2f5;
+  --color-coastal-blue-20: #cee5ea;
+  --color-coastal-blue-30: #a2cdd6;
+  --color-coastal-blue-40: #7fbac7;
+  --color-coastal-blue-50: #178199;
+  --color-coastal-blue-60: #166374;
+  --color-coastal-blue-70: #16505c;
+  --color-coastal-blue-80: #154650;
+  --color-coastal-blue-90: #153237;
+  --color-coastal-blue-95: #142528;
+
+  --color-emerald-5: #f2f7f7;
+  --color-emerald-10: #e5eff0;
+  --color-emerald-20: #c9dedf;
+  --color-emerald-30: #99c0c3;
+  --color-emerald-40: #73a9ac;
+  --color-emerald-50: #006268;
+  --color-emerald-60: #064e52;
+  --color-emerald-70: #0a4044;
+  --color-emerald-80: #0c393c;
+  --color-emerald-90: #102c2e;
+  --color-emerald-95: #132324;
+
+  --color-seafoam-5: #f5fcfb;
+  --color-seafoam-10: #ecf9f7;
+  --color-seafoam-20: #d7f2ed;
+  --color-seafoam-30: #b2e7dd;
+  --color-seafoam-40: #95ddd1;
+  --color-seafoam-50: #3fc2ab;
+  --color-seafoam-60: #329181;
+  --color-seafoam-70: #2a7065;
+  --color-seafoam-80: #256057;
+  --color-seafoam-90: #1d3f3b;
+  --color-seafoam-95: #172929;
+
+  --color-amber-5: #fefbf5;
+  --color-amber-10: #fdf8eb;
+  --color-amber-20: #fcefd5;
+  --color-amber-30: #f9e1ae;
+  --color-amber-40: #f7d690;
+  --color-amber-50: #f0b535;
+  --color-amber-60: #ae882e;
+  --color-amber-70: #826a2a;
+  --color-amber-80: #6c5a28;
+  --color-amber-90: #403c23;
+  --color-amber-95: #232921;
+
+  --color-frost-5: #fbfdfd;
+  --color-frost-10: #f8fcfc;
+  --color-frost-20: #f0f8f9;
+  --color-frost-30: #e3f1f3;
+  --color-frost-40: #d8ecef;
+  --color-frost-50: #b8dde1;
+  --color-frost-60: #87a4a7;
+  --color-frost-70: #667e80;
+  --color-frost-80: #566a6d;
+  --color-frost-90: #354446;
+  --color-frost-95: #1f2b2d;
+
+  --color-sand-5: #fcfaf6;
+  --color-sand-10: #f9f6ef;
+  --color-sand-20: #f5efe1;
+  --color-sand-30: #f0e6d1;
+  --color-sand-40: #f0e1cb;
+  --color-sand-50: #e5d3ac;
+  --color-sand-60: #a89c7c;
+  --color-sand-70: #8a846a;
+  --color-sand-80: #78725f;
+  --color-sand-90: #45453d;
+  --color-sand-95: #232824;
+
+  --color-neutral-5: #f8f9f9;
+  --color-neutral-10: #f2f3f3;
+  --color-neutral-20: #e3e5e6;
+  --color-neutral-30: #c9cecf;
+  --color-neutral-40: #b5bcbc;
+  --color-neutral-50: #798586;
+  --color-neutral-60: #5b6667;
+  --color-neutral-70: #475253;
+  --color-neutral-80: #3c4748;
+  --color-neutral-90: #283334;
+  --color-neutral-95: #141e1f;
+
+  --color-shade-5: #141e1f0d;
+  --color-shade-10: #141e1f1a;
+  --color-shade-20: #141e1f33;
+  --color-shade-30: #141e1f4d;
+  --color-shade-40: #141e1f66;
+  --color-shade-50: #141e1f80;
+  --color-shade-60: #141e1f99;
+  --color-shade-70: #141e1fb3;
+  --color-shade-80: #141e1fcc;
+  --color-shade-90: #141e1fe6;
+  --color-shade-95: #141e1ff2;
+
+  --color-red-5: #fcf6f4;
+  --color-red-10: #faede9;
+  --color-red-20: #f4dad1;
+  --color-red-30: #eab8a8;
+  --color-red-40: #e29d87;
+  --color-red-50: #cb4d25;
+  --color-red-60: #943f23;
+  --color-red-70: #703622;
+  --color-red-80: #5d3121;
+  --color-red-90: #392720;
+  --color-red-95: #21211f;
+
+  --color-highlight: #188199;
+  --color-error: #cb4d25;
+  --color-blue-link: #3b76f4;
+  --color-system-blue-light: #c9daff;
+  --color-unnamed-blue-10: #e9f0fe;
+  --color-system-grey-3: #c7c7cc;
+
+  /* colors.ts: semantic groups */
+  --color-fills-background: var(--color-deep-navy-10);
+
+  --color-text-light: #253845b2;
+  --color-text-medium: #253845cc;
+  --color-text-dark: var(--color-deep-navy-80);
+  --color-text-inverse: #ffffff;
+  --color-text-highlight: var(--color-coastal-blue-50);
+  --color-text-success: var(--color-seafoam-70);
+  --color-text-warning: var(--color-amber-80);
+  --color-text-error: var(--color-red-70);
+  --color-text-disabled: #141e1f80;
+
+  --color-border-default: #c9cecf;
+  --color-border-light: var(--color-shade-5);
+  --color-border-medium: var(--color-shade-10);
+  --color-border-dark: var(--color-shade-20);
+  --color-border-darker: var(--color-shade-40);
+  --color-border-focus: var(--color-neutral-95);
+  --color-border-highlight: var(--color-coastal-blue-50);
+  --color-border-error: var(--color-red-50);
+
+  --color-background: var(--color-deep-navy-10);
+  --color-surface-default: var(--color-primary-white);
+  --color-surface-highlight: var(--color-coastal-blue-10);
+  --color-surface-active: var(--color-coastal-blue-10);
+  --color-surface-error: var(--color-red-20);
+  --color-surface-success: var(--color-seafoam-20);
+  --color-surface-warning: var(--color-amber-20);
+  --color-surface-disabled: #f3f4f4;
+  --color-popup-overlay: #141e1f80;
+
+  --color-card-border: var(--color-shade-10);
+  --color-card-fill: var(--color-primary-white);
+  --color-card-fill-active: var(--color-coastal-blue-10);
+  --color-card-border-active: var(--color-coastal-blue-20);
+
+  /* tailwind.config.ts: font families (loaded by next/font in layout.tsx) */
+  --font-sans: var(--font-outfit), sans-serif;
+  --font-poppins: var(--font-poppins-face), sans-serif;
+
+  /* font-size.ts */
+  --text-size-1: 10px;
+  --text-size-2: 12px;
+  --text-size-3: 14px;
+  --text-size-4: 16px;
+  --text-size-5: 20px;
+  --text-size-6: 24px;
+  --text-size-7: 32px;
+  --text-size-8: 40px;
+  --text-size-9: 48px;
+  --text-size-10: 56px;
+  --text-size-11: 64px;
+  --text-size-12: 72px;
+  --text-size-13: 80px;
+  --text-size-14: 96px;
+  --text-size-15: 112px;
+  --text-size-16: 128px;
+
+  /*
+   * Typography/utils.ts type scale: `text-scale-N` sets size, line height and
+   * letter spacing together, like the DS Paragraph/Label/Heading components.
+   * Scale 4 is Figma's "P - Medium" and scale 3 is "P - Small".
+   */
+  --text-scale-1: 10px;
+  --text-scale-1--line-height: 16px;
+  --text-scale-1--letter-spacing: 0.16px;
+  --text-scale-2: 12px;
+  --text-scale-2--line-height: 18px;
+  --text-scale-2--letter-spacing: 0.14px;
+  --text-scale-3: 14px;
+  --text-scale-3--line-height: 20px;
+  --text-scale-3--letter-spacing: 0.12px;
+  --text-scale-4: 16px;
+  --text-scale-4--line-height: 20px;
+  --text-scale-4--letter-spacing: 0.12px;
+  --text-scale-4\.5: 18px;
+  --text-scale-4\.5--line-height: 24px;
+  --text-scale-4\.5--letter-spacing: 0.12px;
+  --text-scale-5: 20px;
+  --text-scale-5--line-height: 28px;
+  --text-scale-5--letter-spacing: 0.1px;
+  --text-scale-6: 24px;
+  --text-scale-6--line-height: 32px;
+  --text-scale-6--letter-spacing: 0.1px;
+  --text-scale-7: 32px;
+  --text-scale-7--line-height: 44px;
+  --text-scale-7--letter-spacing: 0px;
+  --text-scale-8: 40px;
+  --text-scale-8--line-height: 56px;
+  --text-scale-8--letter-spacing: 0px;
+  --text-scale-9: 48px;
+  --text-scale-9--line-height: 68px;
+  --text-scale-9--letter-spacing: -0.1px;
+  --text-scale-10: 56px;
+  --text-scale-10--line-height: 72px;
+  --text-scale-10--letter-spacing: -0.12px;
+
+  /* lineHeight.ts */
+  --leading-lineheight-2: 18px;
+  --leading-lineheight-3: 20px;
+  --leading-lineheight-4: 24px;
+  --leading-lineheight-5: 28px;
+  --leading-lineheight-7: 44px;
+
+  /* letterSpacing.ts */
+  --tracking-letter-spacing-2: 0.14px;
+  --tracking-letter-spacing-3: 0.12px;
+  --tracking-letter-spacing-4: 0.12px;
+  --tracking-letter-spacing-7: 0px;
+
+  /* borderRadius.ts */
+  --radius-small: 2px;
+  --radius-medium: 4px;
+  --radius-large: 8px;
+  --radius-larger: 16px;
+
+  /* boxShadow.ts */
+  --shadow-hover-large: 0px 4px 8px 0px rgba(20, 30, 31, 0.1);
+  --shadow-hover-small: 0 2px 4px 0 rgba(20, 30, 31, 0.1);
+  --shadow-float-small: 0 8px 24px 0 rgba(20, 30, 31, 0.2);
+  --shadow-hover-small-inverse: 0 -2px 4px 0 rgba(20, 30, 31, 0.1);
+  --shadow-hover-large-inverse: 0px -4px 8px 0px rgba(20, 30, 31, 0.1);
+
+  /* spacing.ts (Tailwind's default 4px scale stays available alongside these) */
+  --spacing-sp-0\.125: 1px;
+  --spacing-sp-0\.25: 2px;
+  --spacing-sp-0\.5: 4px;
+  --spacing-sp-0\.75: 6px;
+  --spacing-sp-1: 8px;
+  --spacing-sp-1\.5: 12px;
+  --spacing-sp-2: 16px;
+  --spacing-sp-2\.5: 20px;
+  --spacing-sp-3: 24px;
+  --spacing-sp-4: 32px;
+  --spacing-sp-5: 40px;
+  --spacing-sp-6: 48px;
+  --spacing-sp-7: 56px;
+  --spacing-sp-8: 64px;
+  --spacing-sp-9: 72px;
+  --spacing-sp-10: 80px;
+  --spacing-sp-12: 96px;
+  --spacing-sp-14: 112px;
+  --spacing-sp-16: 128px;
+  --spacing-sp-18: 144px;
+  --spacing-sp-20: 160px;
+  --spacing-sp-24: 192px;
+  --spacing-sp-32: 256px;
+  --spacing-sp-40: 320px;
+  --spacing-sp-48: 384px;
+  --spacing-sp-56: 448px;
+  --spacing-sp-64: 512px;
+  --spacing-sp-72: 576px;
+  --spacing-sp-80: 640px;
+  --spacing-sp-88: 704px;
+  --spacing-sp-96: 768px;
+
+  /* screens.ts */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 320px;
+  --breakpoint-md: 576px;
+  --breakpoint-lg: 1024px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* tailwind.config.ts: `touch` / `not-touch` variants */
+@custom-variant touch (@media (pointer: coarse));
+@custom-variant not-touch (@media (hover: hover) and (pointer: fine));
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-background font-sans text-text-dark antialiased;
 }
