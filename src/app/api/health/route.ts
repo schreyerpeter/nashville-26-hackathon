@@ -19,9 +19,11 @@ async function checkSupabase(): Promise<SupabaseHealth> {
   }
 
   try {
-    // The REST root answers without any tables existing yet, which is what we
-    // want from a shell: it proves the URL and key line up, nothing more.
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+    // The auth health endpoint answers without any tables or users existing
+    // yet, which is what we want from a shell: it returns 200 only when the
+    // URL resolves and the key is valid, and 401 otherwise. The PostgREST root
+    // rejects publishable keys outright, so it cannot serve as a liveness probe.
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
       headers: { apikey: SUPABASE_ANON_KEY },
       cache: "no-store",
       signal: AbortSignal.timeout(5000),
