@@ -1,6 +1,6 @@
 # nashville-26-hackathon
 
-The QuickMD Community: a private Discourse forum that only QuickMD patients can
+QuickMD Together: a private Discourse forum that only QuickMD patients can
 join. This app is its DiscourseConnect provider, so patients sign in with their
 QuickMD account and appear on the forum under a pseudonym. Next.js (App Router,
 TypeScript, Tailwind) on Vercel, with continuous deployment from `main`.

@@ -83,11 +83,11 @@ container, and this app runs beside it with `npm run dev`.
 3. `npm run dev`, or restart it if it was already running, so it reads `.env.local`.
    Then open http://localhost:3000.
 
-**Sample content:** `scripts/discourse-local.sh seed` makes the forum look like a
-lived-in QuickMD Community. It's safe to re-run; `--reset` deletes the sample content
+**Sample content:** `scripts/discourse-local.sh seed` makes the forum look
+lived-in. It's safe to re-run; `--reset` deletes the sample content
 and seeds it again.
 - **Branding:**
-  - the QuickMD Community logo and favicon
+  - the QuickMD logo and favicon
   - a QuickMD color scheme (design-system coastal blue, navy and amber)
   - Discourse's welcome topic rewritten as the site banner, with a full-width hero image.
     A small "QuickMD branding" theme component keeps the hero from being cropped.

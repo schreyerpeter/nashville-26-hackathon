@@ -1,4 +1,4 @@
-# Seeds the local Discourse so it looks like a lived-in QuickMD Community for demos:
+# Seeds the local Discourse so it looks like a lived-in QuickMD Together forum for demos:
 # QuickMD branding (logo, colors, a hero banner on the welcome topic), sample members,
 # categories, and five topics with replies. Safe to re-run: anything that already
 # exists is skipped. Run it with `scripts/discourse-local.sh seed`; add `--reset` to
@@ -26,9 +26,9 @@ CATEGORIES = [
 ]
 
 WELCOME = <<~MD
-  ![QuickMD Community|1600x560](%<hero>s)
+  ![QuickMD Together|1600x560](%<hero>s)
 
-  **Welcome to the QuickMD Community.** Everyone here is a QuickMD patient, and everyone shows up under a private username, never their real name.
+  **Welcome to QuickMD Together.** Everyone here is a QuickMD patient, and everyone shows up under a private username, never their real name.
 
   - **Introduce yourself** in [Introductions](/c/introductions), as much or as little as you like.
   - **Share a win** in [Wins](/c/wins). Small ones count.
@@ -177,11 +177,11 @@ default_theme.add_relative_theme!(:child, component) unless default_theme.child_
 
 # The welcome topic Discourse creates on install becomes the hero banner.
 welcome = Topic.find_by(id: SiteSetting.welcome_topic_id)
-if welcome && !welcome.first_post.raw.include?("QuickMD Community|1600x560")
+if welcome && !welcome.first_post.raw.include?("QuickMD Together|1600x560")
   hero = upload("community-hero.png", "composer")
   PostRevisor.new(welcome.first_post).revise!(
     system,
-    { title: "Welcome to the QuickMD Community", raw: format(WELCOME, hero: hero.short_url) },
+    { title: "Welcome to QuickMD Together", raw: format(WELCOME, hero: hero.short_url) },
     skip_validations: true,
     bypass_bump: true,
   )

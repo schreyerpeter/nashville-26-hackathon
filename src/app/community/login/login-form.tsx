@@ -2,49 +2,70 @@
 
 import { useActionState } from "react";
 
-import { button, card, field } from "@/components/ui/styles";
+import { button, errorMessage, field, formField, label } from "@/components/ui/styles";
 
 import { signIn, type FormState } from "./actions";
 
 const initialState: FormState = { error: null };
 
+// patient-web's LoginForm: label, then any error, then the input, and the API error shown
+// on the password field.
 export function LoginForm({ sso, sig }: { sso: string; sig: string }) {
   const [state, action, pending] = useActionState(signIn, initialState);
+  const invalid = state.error ? true : undefined;
 
   return (
-    <form action={action} className={`${card} space-y-sp-1.5 p-sp-2.5`}>
+    <form action={action} className="grid gap-sp-2">
       <input type="hidden" name="sso" value={sso} />
       <input type="hidden" name="sig" value={sig} />
-      <label className="block space-y-sp-0.5">
-        <span className="text-scale-3 font-semibold">Email</span>
+
+      <div className={formField}>
+        <label data-slot="label" htmlFor="email" className={label.lg}>
+          Email
+        </label>
         <input
+          id="email"
           name="email"
           type="email"
           required
           autoComplete="email"
+          placeholder="Enter your email"
           defaultValue={state.email}
-          aria-invalid={state.error ? true : undefined}
-          className={`${field} h-11`}
+          disabled={pending}
+          className={field}
         />
-      </label>
-      <label className="block space-y-sp-0.5">
-        <span className="text-scale-3 font-semibold">Password</span>
+      </div>
+
+      <div className={formField}>
+        <label data-slot="label" htmlFor="password" className={label.lg}>
+          Password
+        </label>
+        {state.error && (
+          <p id="password-error" role="alert" className={errorMessage}>
+            {state.error}
+          </p>
+        )}
         <input
+          id="password"
           name="password"
           type="password"
           required
           autoComplete="current-password"
-          aria-invalid={state.error ? true : undefined}
-          className={`${field} h-11`}
+          placeholder="Enter your password"
+          aria-invalid={invalid}
+          aria-describedby={invalid && "password-error"}
+          disabled={pending}
+          className={field}
         />
-      </label>
-      {state.error && (
-        <p role="alert" className="text-scale-3 text-text-error">
-          {state.error}
-        </p>
-      )}
-      <button type="submit" disabled={pending} className={`${button()} w-full`}>
-        {pending ? "Signing in…" : "Sign in"}
+      </div>
+
+      <button
+        type="submit"
+        disabled={pending}
+        aria-busy={pending}
+        className={`${button("primary", "m", { loading: pending })} mt-sp-1 w-full`}
+      >
+        {pending ? "Logging in…" : "Continue"}
       </button>
     </form>
   );

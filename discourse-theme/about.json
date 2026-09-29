@@ -1,0 +1,22 @@
+{
+  "name": "QuickMD",
+  "about_url": null,
+  "license_url": null,
+  "component": false,
+  "color_schemes": {
+    "QuickMD": {
+      "primary": "253845",
+      "secondary": "ffffff",
+      "tertiary": "178199",
+      "quaternary": "178199",
+      "header_background": "ffffff",
+      "header_primary": "253845",
+      "highlight": "f0b535",
+      "selected": "e8f2f5",
+      "hover": "f3f9fa",
+      "danger": "cb4d25",
+      "success": "329181",
+      "love": "ec6c58"
+    }
+  }
+}
