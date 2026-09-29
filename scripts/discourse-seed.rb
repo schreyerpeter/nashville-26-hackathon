@@ -240,17 +240,20 @@ component.save!
 default_theme = Theme.find(SiteSetting.default_theme_id)
 default_theme.add_relative_theme!(:child, component) unless default_theme.child_themes.include?(component)
 
-# The welcome topic Discourse creates on install becomes the hero banner.
+# The welcome topic Discourse creates on install becomes the hero banner. Uploads are
+# deduplicated by content, so re-running only rewrites the post when the image changed.
 welcome = Topic.find_by(id: SiteSetting.welcome_topic_id)
-if welcome && !welcome.first_post.raw.include?("QuickMD Together|1600x560")
+if welcome
   hero = upload("community-hero.png", "composer")
-  PostRevisor.new(welcome.first_post).revise!(
-    system,
-    { title: "Welcome to QuickMD Together", raw: format(WELCOME, hero: hero.short_url) },
-    skip_validations: true,
-    bypass_bump: true,
-  )
-  welcome.reload.make_banner!(system)
+  unless welcome.first_post.raw.include?(hero.short_url)
+    PostRevisor.new(welcome.first_post).revise!(
+      system,
+      { title: "Welcome to QuickMD Together", raw: format(WELCOME, hero: hero.short_url) },
+      skip_validations: true,
+      bypass_bump: true,
+    )
+  end
+  welcome.reload.make_banner!(system) unless welcome.archetype == Archetype.banner
 end
 # Bring the hero back for anyone who closed it, so every demo starts with it showing.
 UserProfile.where(dismissed_banner_key: welcome.id).update_all(dismissed_banner_key: nil) if welcome
