@@ -4,7 +4,8 @@
 #
 #   scripts/discourse-local.sh setup   # first time: start the container, install, migrate, configure
 #   scripts/discourse-local.sh start   # start the container and the Discourse dev server
-#   scripts/discourse-local.sh seed    # add sample members, categories, and topics (re-runnable)
+#   scripts/discourse-local.sh seed    # QuickMD branding plus sample members and topics (re-runnable;
+#                                      # add --reset to replace earlier sample content)
 #   scripts/discourse-local.sh stop    # stop both
 #   scripts/discourse-local.sh logs    # follow the dev server log
 #
@@ -154,10 +155,15 @@ RUBY
 }
 
 seed() {
-  mkdir -p "$DISCOURSE_DIR/tmp"
+  local reset=0
+  [ "${1:-}" = "--reset" ] && reset=1
+  mkdir -p "$DISCOURSE_DIR/tmp/qmd-seed-assets"
   cp "$APP_DIR/scripts/discourse-seed.rb" "$DISCOURSE_DIR/tmp/qmd-seed.rb"
-  dexec bin/rails runner tmp/qmd-seed.rb
-  rm -f "$DISCOURSE_DIR/tmp/qmd-seed.rb"
+  cp "$APP_DIR"/scripts/seed-assets/*.png "$DISCOURSE_DIR/tmp/qmd-seed-assets/"
+  docker exec -u discourse:discourse -w /src \
+    -e QMD_SEED_ASSETS=/src/tmp/qmd-seed-assets -e QMD_SEED_RESET=$reset \
+    "$NAME" bin/rails runner tmp/qmd-seed.rb
+  rm -rf "$DISCOURSE_DIR/tmp/qmd-seed.rb" "$DISCOURSE_DIR/tmp/qmd-seed-assets"
 }
 
 case "${1:-}" in
@@ -176,7 +182,7 @@ case "${1:-}" in
     start_server
     ;;
   configure) preflight; configure ;;
-  seed) preflight; seed ;;
+  seed) preflight; seed "${2:-}" ;;
   start) preflight; start_container; start_server ;;
   stop)
     docker stop "$NAME" >/dev/null 2>&1 || true
@@ -184,7 +190,7 @@ case "${1:-}" in
     ;;
   logs) tail -f "$DISCOURSE_DIR/log/dev-server.log" ;;
   *)
-    sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac

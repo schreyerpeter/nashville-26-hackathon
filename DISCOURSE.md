@@ -83,13 +83,28 @@ container, and this app runs beside it with `npm run dev`.
 3. `npm run dev`, or restart it if it was already running, so it reads `.env.local`.
    Then open http://localhost:3000.
 
-**Sample content:** `scripts/discourse-local.sh seed` adds five member accounts and four
-categories: Introductions, Wins, Day to day, and Using QuickMD. It also adds five
-topics with replies, dated across the last two weeks. It's safe to re-run: anything
-that exists already is skipped. The members' pseudonyms look like real patients' but
-they have no SSO record, so nobody can sign in as them. The content is written in
-`scripts/discourse-seed.rb`, and none of it mentions doses, medications or crisis, so
-it won't trip the safety net.
+**Sample content:** `scripts/discourse-local.sh seed` makes the forum look like a
+lived-in QuickMD Community. It's safe to re-run; `--reset` deletes the sample content
+and seeds it again.
+- **Branding:**
+  - the QuickMD Community logo and favicon
+  - a QuickMD color scheme (design-system coastal blue, navy and amber)
+  - Discourse's welcome topic rewritten as the site banner, with a full-width hero image.
+    A small "QuickMD branding" theme component keeps the hero from being cropped.
+- **Content:** five member accounts and four categories: Introductions, Wins, Visits and
+  refills, and Day to day. It also adds five topics with replies, dated across the last
+  two weeks. They're about real QuickMD touchpoints: video visits, refill timing, the
+  pharmacy and member advocates.
+
+The images are in `scripts/seed-assets/`, built from the QuickMD mark, the triangle
+pattern and design-system colors. The posts are in `scripts/discourse-seed.rb`, and they
+follow patient-web's copy rules:
+- no doses or medication names
+- no crisis language, so nothing trips the safety net
+- no "taper" or outcome promises
+
+The sample members' pseudonyms look like real patients', but they have no SSO record,
+so nobody can sign in as them.
 
 **After that:** `scripts/discourse-local.sh start`, `stop`, or `logs`. The database lives
 in `~/quickmd/discourse/data/postgres` and survives restarts. If `.env.local` loses its
