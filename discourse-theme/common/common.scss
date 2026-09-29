@@ -771,6 +771,78 @@ body:not(.welcome-banner--visible) #banner {
   }
 }
 
+/* ---------------------------------------------------- profile and search pages */
+
+/* Discourse paints these panels flat white, edge to edge. Make them proper cards. */
+.user-main {
+  padding-top: 16px;
+
+  .details {
+    align-items: center;
+    background: linear-gradient(100deg, var(--qmd-coastal-blue-10), #fff 70%);
+    border: 1px solid var(--qmd-border-medium);
+    border-radius: var(--qmd-card-radius);
+    box-shadow: var(--qmd-shadow-card);
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    min-height: 88px;
+    padding: 16px 24px;
+  }
+
+  .details .primary {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+  }
+
+  .primary h1,
+  .primary .username,
+  .primary .full-name {
+    color: var(--qmd-navy-80);
+  }
+
+  .avatar {
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--qmd-coastal-blue-20);
+  }
+}
+
+.user-content,
+.user-main .user-content-wrapper .user-content {
+  background: #fff;
+  border: 1px solid var(--qmd-border-medium);
+  border-radius: var(--qmd-card-radius);
+  box-shadow: var(--qmd-shadow-card);
+  padding: 24px;
+}
+
+/* Profile tabs sit on the page, not on a white strip. */
+.user-navigation,
+.user-navigation .nav-pills,
+.user-nav-bar,
+#user-navigation {
+  background: transparent;
+}
+
+/* The search toolbar (sort, filters) is a control row, so it sits on the page too. */
+.search-info,
+.search-container .search-advanced,
+.search-results .search-info {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.search-results .fps-result {
+  border-radius: 12px;
+}
+
+.empty-state,
+.no-content {
+  color: var(--qmd-text-medium);
+}
+
 /* ------------------------------------------------------------------ buttons */
 
 /* Button.tsx: 44px pills, semibold, primary/secondary/tertiary. */
