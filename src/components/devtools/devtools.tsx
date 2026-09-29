@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, useTransition } from "react";
 
 import { signInAsDemoPatient } from "@/app/community/login/actions";
-import { button, card, link } from "@/components/ui/styles";
+import { button, card, link, tab as tabClass, tablist } from "@/components/ui/styles";
 
 import { getDevToolsSession, type Session } from "./actions";
 
@@ -32,7 +32,7 @@ export function DevTools(props: DevToolsProps) {
         onClick={() => setOpen(true)}
         title="Open DevTools"
         aria-label="Open DevTools"
-        className="fixed bottom-sp-2 right-sp-2 z-50 flex size-sp-6 cursor-pointer items-center justify-center rounded-full bg-deep-navy-80 text-text-inverse shadow-hover-large transition-transform hover:scale-110"
+        className="fixed bottom-sp-2 right-sp-2 z-fixed flex size-sp-6 cursor-pointer items-center justify-center rounded-full bg-deep-navy-80 text-text-inverse shadow-hover-large transition-transform hover:scale-110"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
           <polyline points="16 18 22 12 16 6" />
@@ -45,7 +45,7 @@ export function DevTools(props: DevToolsProps) {
   return (
     <section
       aria-label="Developer Tools"
-      className={`${card} fixed bottom-sp-2 right-sp-2 z-50 flex max-h-sp-64 w-sp-48 max-w-full flex-col overflow-hidden shadow-hover-large`}
+      className={`${card} fixed bottom-sp-2 right-sp-2 z-fixed flex max-h-sp-64 w-sp-48 max-w-full flex-col overflow-hidden shadow-float-small`}
     >
       <header className="flex items-center justify-between bg-deep-navy-80 px-sp-1.5 py-sp-1">
         <span className="text-scale-2 font-semibold uppercase text-text-inverse">DevTools</span>
@@ -59,16 +59,14 @@ export function DevTools(props: DevToolsProps) {
           ×
         </button>
       </header>
-      <nav className="flex border-b border-border-medium px-sp-1.5">
+      <nav className={`${tablist} px-sp-1.5`}>
         {(["demo", "environment"] as const).map((name) => (
           <button
             key={name}
             type="button"
             onClick={() => setTab(name)}
             aria-pressed={tab === name}
-            className={`-mb-px cursor-pointer border-b-2 px-sp-1 py-sp-0.75 text-scale-3 font-semibold capitalize ${
-              tab === name ? "border-coastal-blue-50 text-text-highlight" : "border-transparent text-text-medium"
-            }`}
+            className={`${tabClass(tab === name)} capitalize`}
           >
             {name}
           </button>

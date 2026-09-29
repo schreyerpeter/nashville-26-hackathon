@@ -7,6 +7,7 @@
 #   scripts/discourse-local.sh seed    # QuickMD branding plus sample members and topics (re-runnable;
 #                                      # add --reset to replace earlier sample content)
 #   scripts/discourse-local.sh stop    # stop both
+#   scripts/discourse-local.sh theme   # (re)install the QuickMD theme and logo from discourse-theme/
 #   scripts/discourse-local.sh logs    # follow the dev server log
 #
 # Discourse serves on http://localhost:4200 (not its usual 3000, which this app uses), and
@@ -114,7 +115,7 @@ group.members_visibility_level = Group.visibility_levels[:owners]
 group.save!
 
 {
-  title: "QuickMD Community",
+  title: "QuickMD Together",
   site_description: "A private community for QuickMD patients.",
   contact_email: "admin@localhost.test",
   port: "$PORT",
@@ -152,6 +153,33 @@ RUBY
     echo "Saved a new DISCOURSE_API_KEY to .env.local. Restart npm run dev to pick it up."
   fi
   echo "Configured DiscourseConnect against $APP_URL."
+  install_theme
+}
+
+# Imports discourse-theme/ (QuickMD's design system as a Discourse theme), makes it the
+# default with its color scheme, turns dark mode off, and uploads the QuickMD logo.
+install_theme() {
+  rm -rf "$DISCOURSE_DIR/tmp/qmd-theme"
+  cp -R "$APP_DIR/discourse-theme" "$DISCOURSE_DIR/tmp/qmd-theme"
+  cat > "$DISCOURSE_DIR/tmp/qmd-theme.rb" <<'RUBY'
+dir = "tmp/qmd-theme"
+theme = RemoteTheme.import_theme_from_directory(dir, theme_id: Theme.find_by(name: "QuickMD")&.id)
+scheme = ColorScheme.find_by(theme_id: theme.id, name: "QuickMD")
+# The design system is light only, so the theme gets no dark scheme.
+theme.update!(color_scheme: scheme, dark_color_scheme: nil, user_selectable: false)
+theme.set_default!
+Theme.where.not(id: theme.id).update_all(user_selectable: false)
+
+{ logo: "logo.svg", mobile_logo: "logo.svg", logo_small: "logo-mark.svg" }.each do |setting, name|
+  File.open(File.join(dir, "assets", name)) do |file|
+    upload = UploadCreator.new(file, name, for_site_setting: true).create_for(Discourse.system_user.id)
+    SiteSetting.set(setting, upload)
+  end
+end
+puts "Installed the QuickMD theme (id #{theme.id})."
+RUBY
+  dexec bin/rails runner tmp/qmd-theme.rb
+  rm -rf "$DISCOURSE_DIR/tmp/qmd-theme" "$DISCOURSE_DIR/tmp/qmd-theme.rb"
 }
 
 seed() {
@@ -183,6 +211,7 @@ case "${1:-}" in
     ;;
   configure) preflight; configure ;;
   seed) preflight; seed "${2:-}" ;;
+  theme) preflight; install_theme ;;
   start) preflight; start_container; start_server ;;
   stop)
     docker stop "$NAME" >/dev/null 2>&1 || true
@@ -190,7 +219,7 @@ case "${1:-}" in
     ;;
   logs) tail -f "$DISCOURSE_DIR/log/dev-server.log" ;;
   *)
-    sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac

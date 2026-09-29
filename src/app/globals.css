@@ -166,6 +166,12 @@
   /* colors.ts: semantic groups */
   --color-fills-background: var(--color-deep-navy-10);
 
+  /* index.css: the page color patient-web paints behind every screen */
+  --color-app-background: #eceff1;
+
+  /* Logo/LogoFull.tsx: the wordmark's `.cls-2` fill */
+  --color-logo-wordmark: #232728;
+
   --color-text-light: #253845b2;
   --color-text-medium: #253845cc;
   --color-text-dark: var(--color-deep-navy-80);
@@ -320,6 +326,19 @@
   --spacing-sp-88: 704px;
   --spacing-sp-96: 768px;
 
+  /* zIndex.ts */
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-fixed: 300;
+  --z-index-modal: 400;
+  --z-index-toast: 500;
+  --z-index-max: 9999;
+
+  /* animations.ts (keyframes are below, outside @theme) */
+  --animate-fade-in: fade-in 0.5s ease-in-out forwards;
+  --animate-button-primary-loading-pulse: button-primary-loading-pulse 1.5s ease-in-out infinite;
+  --animate-button-secondary-loading-pulse: button-secondary-loading-pulse 1.5s ease-in-out infinite;
+
   /* screens.ts */
   --breakpoint-*: initial;
   --breakpoint-sm: 320px;
@@ -331,6 +350,40 @@
 @custom-variant touch (@media (pointer: coarse));
 @custom-variant not-touch (@media (hover: hover) and (pointer: fine));
 
+/* animations.ts: keyframes */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes button-primary-loading-pulse {
+  0%,
+  100% {
+    background-color: var(--color-coastal-blue-50);
+    border-color: var(--color-coastal-blue-50);
+  }
+  50% {
+    background-color: var(--color-coastal-blue-60);
+    border-color: var(--color-coastal-blue-60);
+  }
+}
+
+@keyframes button-secondary-loading-pulse {
+  0%,
+  100% {
+    background-color: var(--color-coastal-blue-10);
+    border-color: var(--color-coastal-blue-40);
+  }
+  50% {
+    background-color: var(--color-coastal-blue-20);
+    border-color: var(--color-coastal-blue-40);
+  }
+}
+
 body {
-  @apply bg-background font-sans text-text-dark antialiased;
+  @apply bg-app-background font-sans text-text-dark antialiased;
 }

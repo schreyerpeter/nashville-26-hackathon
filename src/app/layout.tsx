@@ -11,7 +11,7 @@ const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"] });
 const poppins = Poppins({ variable: "--font-poppins-face", subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
-  title: "QuickMD Community",
+  title: "QuickMD Together",
   description: "A private community for QuickMD patients.",
 };
 

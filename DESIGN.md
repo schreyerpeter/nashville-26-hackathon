@@ -19,6 +19,7 @@ instead, under the same names QuickMD's apps use.
 | `src/components/data-display/Typography/utils.ts` | `--text-scale-*` → `text-scale-4` (size, line height and tracking together) |
 | `src/theme/lineHeight.ts`, `letterSpacing.ts` | `leading-lineheight-3`, `tracking-letter-spacing-3` |
 | `src/theme/borderRadius.ts` | `rounded-small` / `medium` / `large` / `larger` (2 / 4 / 8 / 16px) |
+| `src/theme/zIndex.ts`, `animations.ts` | `z-sticky`, `z-fixed`, …; `animate-fade-in`, button loading pulses |
 | `src/theme/boxShadow.ts` | `shadow-hover-small`, `shadow-hover-large`, `shadow-float-small` |
 | `src/theme/spacing.ts` | `p-sp-2`, `gap-sp-1.5`, `space-y-sp-3`, … (sp-1 = 8px) |
 | `src/theme/screens.ts` | breakpoints `sm` 320px, `md` 576px, `lg` 1024px |
@@ -48,14 +49,31 @@ instead, under the same names QuickMD's apps use.
 
 Reuse these before writing classes for the same element.
 
-- `button(priority?, size?)` from `styles.ts`: the design-system `Button`, a pill with
-  `"primary"` (default), `"secondary"`, or `"tertiary"` priority and `"m"` (44px, default)
-  or `"s"` (32px) size. Example: `<button className={button("secondary", "s")}>`.
-- `field`: the design-system outlined `Input`. Add `h-11` on single-line inputs.
-  Textareas size by `rows`. Set `aria-invalid` to get the error state.
-- `card`: a white card with a `card-border` outline and `rounded-large`.
-- `link`: an inline coastal-blue text link.
-- `LogoMark` from `logo.tsx`: the QuickMD mark. Size it with `h-*` and `w-auto`.
+- `button(priority?, size?, { loading? })` from `styles.ts`: the design-system `Button`, a
+  pill with `"primary"` (default), `"secondary"`, or `"tertiary"` priority and `"m"` (44px,
+  default) or `"s"` (32px) size. `loading` pulses the fill the way the DS does; pair it with
+  `disabled` and `aria-busy`. Example: `<button className={button("secondary", "s")}>`.
+- `heading.h1` / `h2` / `h3`: DS `Heading` (scale 7 / 6 / 5, semibold). A page title is `h1`.
+- `paragraph.md` / `sm` / `xs`: DS `Paragraph`. Body copy is `text-text-medium`, not dark.
+- `label.lg` / `md` / `sm`: DS `Label` and `FormLabel` (semibold).
+- `formField`, `field`, `errorMessage`: DS `Field` + `Input` + `ErrorMessage`. Wrap a
+  `data-slot="label"` label, an optional error, and the input in `formField`; set
+  `aria-invalid` on the input and the label, input, and fill all turn red.
+- `card` / `cardInteractive`: the white, `border-medium`, `rounded-large` cards from the
+  patient-web dashboard; the interactive one tints coastal-blue on hover.
+- `banner(variant)`: DS `Banner` (`informative`, `warning`, `error`, `success`). Returns
+  `box`, `title`, and `text` classes.
+- `link`: DS `Link`. Semibold, in the text color, with a 1px shade-20 underline. It is
+  **not** blue.
+- `tablist` / `tab(active)`: DS `Tabset`.
+- `Logo` and `LogoMark` from `logo.tsx`: the full QuickMD wordmark (`size` xss to xl, as
+  in the DS) and the mark alone. Screens use `Logo`, like patient-web.
+- `TopNav` and `PageContent` from `top-nav.tsx`: patient-web's white top bar (logo, product
+  name, one action) and its standard page padding.
+
+Screen patterns come from patient-web: sign-in screens use its `AuthLayout` (one centered
+white card, logo on top, centered `h2`); other screens use `TopNav` + `PageContent` with
+sections stacked `gap-sp-3`/`gap-sp-5`, each an `h3` over its content.
 
 If a design-system component you need isn't here yet, port its classes from
 `~/quickmd/design-system/src/components/<group>/<Name>/<Name>.tsx` into
@@ -75,3 +93,12 @@ If a design-system component you need isn't here yet, port its classes from
   than invent one.
 - **Mind the breakpoints.** They are QuickMD's: `sm` is 320px (almost always on), so
   use `md:` (576px) for "above phone width" and `lg:` (1024px) for desktop.
+
+## The forum (Discourse)
+
+`discourse-theme/` is the same design system as a Discourse theme: the palette as a color
+scheme in `about.json`, and Outfit, pill buttons, 8px cards, the Tabset-style nav, and the
+input states in `common/common.scss`, plus the logo SVGs. `scripts/discourse-local.sh
+setup` installs it; after editing it, run `scripts/discourse-local.sh theme` to reapply.
+Hex values are allowed there (Discourse has no Tailwind), but copy them from
+`globals.css` rather than inventing new ones.
