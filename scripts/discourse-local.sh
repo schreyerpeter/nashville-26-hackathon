@@ -4,6 +4,7 @@
 #
 #   scripts/discourse-local.sh setup   # first time: start the container, install, migrate, configure
 #   scripts/discourse-local.sh start   # start the container and the Discourse dev server
+#   scripts/discourse-local.sh seed    # add sample members, categories, and topics (re-runnable)
 #   scripts/discourse-local.sh stop    # stop both
 #   scripts/discourse-local.sh logs    # follow the dev server log
 #
@@ -152,6 +153,13 @@ RUBY
   echo "Configured DiscourseConnect against $APP_URL."
 }
 
+seed() {
+  mkdir -p "$DISCOURSE_DIR/tmp"
+  cp "$APP_DIR/scripts/discourse-seed.rb" "$DISCOURSE_DIR/tmp/qmd-seed.rb"
+  dexec bin/rails runner tmp/qmd-seed.rb
+  rm -f "$DISCOURSE_DIR/tmp/qmd-seed.rb"
+}
+
 case "${1:-}" in
   setup)
     preflight
@@ -164,9 +172,11 @@ case "${1:-}" in
     dexec pnpm install
     dexec bin/rake db:create db:migrate
     configure
+    seed
     start_server
     ;;
   configure) preflight; configure ;;
+  seed) preflight; seed ;;
   start) preflight; start_container; start_server ;;
   stop)
     docker stop "$NAME" >/dev/null 2>&1 || true
@@ -174,7 +184,7 @@ case "${1:-}" in
     ;;
   logs) tail -f "$DISCOURSE_DIR/log/dev-server.log" ;;
   *)
-    sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac

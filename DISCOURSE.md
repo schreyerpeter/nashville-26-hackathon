@@ -72,6 +72,7 @@ container, and this app runs beside it with `npm run dev`.
    - clones Discourse to `~/quickmd/discourse` and starts the container
    - installs gems and packages, and migrates the database
    - applies the settings below and writes `DISCOURSE_API_KEY` into `.env.local`
+   - seeds sample content (below)
    - starts the server
 
    Expect about 15 minutes the first time.
@@ -81,6 +82,14 @@ container, and this app runs beside it with `npm run dev`.
    sign-in page.
 3. `npm run dev`, or restart it if it was already running, so it reads `.env.local`.
    Then open http://localhost:3000.
+
+**Sample content:** `scripts/discourse-local.sh seed` adds five member accounts and four
+categories: Introductions, Wins, Day to day, and Using QuickMD. It also adds five
+topics with replies, dated across the last two weeks. It's safe to re-run: anything
+that exists already is skipped. The members' pseudonyms look like real patients' but
+they have no SSO record, so nobody can sign in as them. The content is written in
+`scripts/discourse-seed.rb`, and none of it mentions doses, medications or crisis, so
+it won't trip the safety net.
 
 **After that:** `scripts/discourse-local.sh start`, `stop`, or `logs`. The database lives
 in `~/quickmd/discourse/data/postgres` and survives restarts. If `.env.local` loses its
