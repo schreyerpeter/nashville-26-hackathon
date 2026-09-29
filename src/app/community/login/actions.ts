@@ -9,7 +9,8 @@ import {
   getPatient,
   login,
 } from "@/lib/quickmd/api";
-import { startSession } from "@/lib/session";
+import type { Patient } from "@/lib/quickmd/api";
+import { acceptTerms, endSession, getSession, hasAcceptedTerms, startSession } from "@/lib/session";
 
 export type FormState = { error: string | null; email?: string };
 
@@ -26,6 +27,12 @@ async function signInWith(email: string, password: string, sso: string, sig: str
   if (!patient) return { error: "That account isn't a patient account.", email };
   await startSession(patient);
 
+  // First time in: back to this page, which now shows the terms instead of the form.
+  if (!(await hasAcceptedTerms(patient))) redirect(`/community/login?${new URLSearchParams({ sso, sig })}`);
+  enterForum(patient, sso, sig);
+}
+
+function enterForum(patient: Patient, sso: string, sig: string): never {
   // Arriving from Discourse, finish the handshake. Arriving directly, open the forum,
   // which starts a fresh handshake that our new cookie answers without a second login.
   const connect = verifyRequest(sso, sig);
@@ -47,4 +54,18 @@ export async function signInAsDemoPatient(sso: string, sig: string): Promise<For
     return { error: "Set DEMO_PATIENT_EMAIL and DEMO_PATIENT_PASSWORD to turn this on." };
   }
   return signInWith(DEMO_PATIENT_EMAIL, DEMO_PATIENT_PASSWORD, sso, sig);
+}
+
+/** The terms modal's "I agree": remember it, then carry on into the forum. */
+export async function agreeToTerms(formData: FormData) {
+  const patient = await getSession();
+  if (!patient) redirect("/community/login");
+  await acceptTerms(patient);
+  enterForum(patient, text(formData, "sso"), text(formData, "sig"));
+}
+
+/** The terms modal's way out. Nobody stays signed in without agreeing. */
+export async function declineTerms() {
+  await endSession();
+  redirect("/");
 }

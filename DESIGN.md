@@ -70,6 +70,10 @@ Reuse these before writing classes for the same element.
   in the DS) and the mark alone. Screens use `Logo`, like patient-web.
 - `TopNav` and `PageContent` from `top-nav.tsx`: patient-web's white top bar (logo, product
   name, one action) and its standard page padding.
+- `Popup` from `popup.tsx`: the design-system `Popup` that patient-web uses for modals,
+  built on Headless UI and SimpleBar. Pass `header`, `body`, and `footer`, and toggle
+  `isOpen` rather than mounting it conditionally. Set `lockOpen` when the only way out is a
+  button in the footer.
 
 Screen patterns come from patient-web: sign-in screens use its `AuthLayout` (one centered
 white card, logo on top, centered `h2`); other screens use `TopNav` + `PageContent` with

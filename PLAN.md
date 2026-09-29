@@ -63,7 +63,7 @@ Not in scope: in-app entry point, onboarding and cohort spaces, hosted presence/
 - [ ] **Weekly nudge** `src/app/api/cron/weekly-nudge/route.ts` on a Vercel cron
   (`CRON_SECRET`):
   - for each patient, read unread reply counts from the Discourse admin API
-  - send "You have N new replies in QuickMD Community" through ACS SMTP, with a generic
+  - send "You have N new replies in QuickMD Together" through ACS SMTP, with a generic
     subject and no content
 - [ ] **DevTools:** "Preview weekly nudge" shows the rendered email, and sends it if SMTP
   is configured. Email is blocked on the ACS role grant (DISCOURSE.md), so the preview is
