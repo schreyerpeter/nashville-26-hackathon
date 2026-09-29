@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { card, link } from "@/components/ui/styles";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,14 +35,14 @@ export default async function IdeaPage({ params }: { params: Promise<{ id: strin
 
   return (
     <PageShell>
-      <Link href="/ideas" className="text-sm text-black/50 hover:text-foreground dark:text-white/50">
+      <Link href="/ideas" className={`${link} text-scale-3`}>
         ← All ideas
       </Link>
 
-      <article className="flex items-start gap-4">
+      <article className="flex items-start gap-sp-2">
         <VoteButton ideaId={id} count={idea.vote_count} voted={idea.voted_by_me} />
-        <div className="min-w-0 flex-1 space-y-3">
-          <h2 className="text-2xl font-semibold tracking-tight">{idea.title}</h2>
+        <div className="min-w-0 flex-1 space-y-sp-1.5">
+          <h2 className="text-scale-6 font-semibold">{idea.title}</h2>
           <Byline name={idea.author_name} createdAt={idea.created_at}>
             {idea.is_mine && (
               <form action={deleteIdea} className="contents">
@@ -54,24 +55,24 @@ export default async function IdeaPage({ params }: { params: Promise<{ id: strin
             )}
           </Byline>
           {idea.description && (
-            <p className="whitespace-pre-wrap text-black/80 dark:text-white/80">{idea.description}</p>
+            <p className="whitespace-pre-wrap text-scale-4 text-text-medium">{idea.description}</p>
           )}
         </div>
       </article>
 
-      <section className="space-y-4">
-        <h3 className="text-sm font-medium">
+      <section className="space-y-sp-2">
+        <h3 className="text-scale-3 font-semibold">
           {comments?.length ?? 0} {comments?.length === 1 ? "comment" : "comments"}
         </h3>
 
         {commentsError && <Notice>Couldn&apos;t load comments: {commentsError.message}</Notice>}
 
         {!!comments?.length && (
-          <ul className="rounded-xl border border-black/10 px-5 dark:border-white/15">
+          <ul className={`${card} px-sp-2.5`}>
             {comments.map((comment) => (
               <li
                 key={comment.id}
-                className="space-y-2 border-b border-black/10 py-4 last:border-0 dark:border-white/15"
+                className="space-y-sp-1 border-b border-border-medium py-sp-2 last:border-0"
               >
                 <Byline name={comment.author_name} createdAt={comment.created_at}>
                   {comment.is_mine && (
@@ -82,7 +83,7 @@ export default async function IdeaPage({ params }: { params: Promise<{ id: strin
                     </form>
                   )}
                 </Byline>
-                <p className="whitespace-pre-wrap text-sm">{comment.body}</p>
+                <p className="whitespace-pre-wrap text-scale-3">{comment.body}</p>
               </li>
             ))}
           </ul>

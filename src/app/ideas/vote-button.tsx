@@ -22,13 +22,13 @@ export function VoteButton({ ideaId, count, voted }: { ideaId: string; count: nu
       onClick={toggle}
       aria-pressed={optimistic.voted}
       aria-label={optimistic.voted ? "Remove your vote" : "Vote for this idea"}
-      className={`flex w-12 shrink-0 flex-col items-center rounded-lg border py-1.5 text-sm font-medium tabular-nums transition-colors ${
+      className={`flex w-12 shrink-0 cursor-pointer flex-col items-center rounded-large border py-sp-0.75 text-scale-3 font-semibold tabular-nums transition-colors ${
         optimistic.voted
-          ? "border-foreground bg-foreground text-background"
-          : "border-black/15 hover:border-black/40 dark:border-white/20 dark:hover:border-white/50"
+          ? "border-coastal-blue-50 bg-coastal-blue-50 text-white hover:border-coastal-blue-60 hover:bg-coastal-blue-60"
+          : "border-coastal-blue-40 bg-coastal-blue-10 text-coastal-blue-50 hover:bg-coastal-blue-20"
       }`}
     >
-      <span aria-hidden className="text-xs leading-none">
+      <span aria-hidden className="text-scale-2">
         ▲
       </span>
       {optimistic.count}

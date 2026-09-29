@@ -8,7 +8,7 @@ export function ConfirmButton({ message, children }: { message: string; children
       onClick={(event) => {
         if (!window.confirm(message)) event.preventDefault();
       }}
-      className="underline-offset-4 hover:text-red-600 hover:underline dark:hover:text-red-400"
+      className="cursor-pointer underline-offset-4 hover:text-text-error hover:underline"
     >
       {children}
     </button>

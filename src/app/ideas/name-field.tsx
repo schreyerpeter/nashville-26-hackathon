@@ -1,5 +1,6 @@
+import { field } from "@/components/ui/styles";
+
 import { DEFAULT_NAME, NAME_MAX } from "./limits";
-import { fieldClass } from "./styles";
 
 export function NameField({ defaultValue }: { defaultValue: string }) {
   return (
@@ -9,7 +10,7 @@ export function NameField({ defaultValue }: { defaultValue: string }) {
       aria-label="Your name"
       placeholder={`Your name (blank posts as ${DEFAULT_NAME})`}
       defaultValue={defaultValue}
-      className={`${fieldClass} min-w-48 flex-1 sm:max-w-xs`}
+      className={`${field} h-11 min-w-48 flex-1 md:max-w-xs`}
     />
   );
 }

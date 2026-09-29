@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { card, link } from "@/components/ui/styles";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,10 +22,10 @@ function SortLink({ sort, current, children }: { sort: Sort; current: Sort; chil
     <Link
       href={`/ideas?sort=${sort}`}
       aria-current={active ? "page" : undefined}
-      className={`rounded-md px-2.5 py-1 ${
+      className={`rounded-full px-sp-1.5 py-sp-0.5 ${
         active
-          ? "bg-black/5 font-medium text-foreground dark:bg-white/10"
-          : "text-black/50 hover:text-foreground dark:text-white/50"
+          ? "bg-coastal-blue-10 font-semibold text-coastal-blue-50"
+          : "text-text-light hover:text-text-highlight"
       }`}
     >
       {children}
@@ -58,12 +59,12 @@ export default async function IdeasPage({ searchParams }: { searchParams: Promis
     <PageShell>
       <IdeaForm defaultName={visitor.name} />
 
-      <section className="space-y-3">
+      <section className="space-y-sp-1.5">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium">
+          <h2 className="text-scale-3 font-semibold">
             {ideas?.length ?? 0} {ideas?.length === 1 ? "idea" : "ideas"}
           </h2>
-          <nav className="flex gap-1 text-sm" aria-label="Sort ideas">
+          <nav className="flex gap-sp-0.5 text-scale-3" aria-label="Sort ideas">
             <SortLink sort="top" current={sort}>
               Top
             </SortLink>
@@ -78,25 +79,25 @@ export default async function IdeasPage({ searchParams }: { searchParams: Promis
         ) : !ideas?.length ? (
           <Notice>No ideas yet. Be the first to submit one.</Notice>
         ) : (
-          <ul className="rounded-xl border border-black/10 px-5 dark:border-white/15">
+          <ul className={`${card} px-sp-2.5`}>
             {ideas.map((idea) => (
               <li
                 key={idea.id}
-                className="flex items-start gap-4 border-b border-black/10 py-4 last:border-0 dark:border-white/15"
+                className="flex items-start gap-sp-2 border-b border-border-medium py-sp-2 last:border-0"
               >
                 <VoteButton ideaId={idea.id} count={idea.vote_count} voted={idea.voted_by_me} />
-                <div className="min-w-0 flex-1 space-y-1.5">
-                  <Link href={`/ideas/${idea.id}`} className="block font-medium hover:underline">
+                <div className="min-w-0 flex-1 space-y-sp-0.75">
+                  <Link href={`/ideas/${idea.id}`} className="block text-scale-4 font-semibold hover:text-text-highlight">
                     {idea.title}
                   </Link>
                   {idea.description && (
-                    <p className="line-clamp-2 text-sm text-black/60 dark:text-white/60">
+                    <p className="line-clamp-2 text-scale-3 text-text-medium">
                       {idea.description}
                     </p>
                   )}
                   <Byline name={idea.author_name} createdAt={idea.created_at}>
                     <span aria-hidden>·</span>
-                    <Link href={`/ideas/${idea.id}`} className="hover:underline">
+                    <Link href={`/ideas/${idea.id}`} className={link}>
                       {idea.comment_count} {idea.comment_count === 1 ? "comment" : "comments"}
                     </Link>
                   </Byline>

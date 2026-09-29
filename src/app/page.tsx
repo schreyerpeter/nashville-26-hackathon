@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { LogoMark } from "@/components/ui/logo";
+import { card, link } from "@/components/ui/styles";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export const dynamic = "force-dynamic";
@@ -8,18 +10,22 @@ type CheckState = "ok" | "pending";
 
 function Check({ label, state, note }: { label: string; state: CheckState; note: string }) {
   return (
-    <li className="flex items-start gap-3 border-b border-black/10 py-4 last:border-0 dark:border-white/15">
+    <li className="flex items-start gap-sp-1.5 border-b border-border-medium py-sp-2 last:border-0">
       <span
         aria-hidden
-        className={`mt-1.5 size-2 shrink-0 rounded-full ${
-          state === "ok" ? "bg-emerald-500" : "bg-amber-500"
+        className={`mt-sp-0.75 size-2 shrink-0 rounded-full ${
+          state === "ok" ? "bg-seafoam-50" : "bg-amber-50"
         }`}
       />
       <span className="flex-1">
-        <span className="block text-sm font-medium">{label}</span>
-        <span className="block text-sm text-black/60 dark:text-white/60">{note}</span>
+        <span className="block text-scale-3 font-semibold">{label}</span>
+        <span className="block text-scale-3 text-text-medium">{note}</span>
       </span>
-      <span className="text-xs uppercase tracking-wide text-black/40 dark:text-white/40">
+      <span
+        className={`text-scale-2 font-semibold uppercase ${
+          state === "ok" ? "text-text-success" : "text-text-warning"
+        }`}
+      >
         {state === "ok" ? "ready" : "pending"}
       </span>
     </li>
@@ -30,31 +36,32 @@ export default function Home() {
   const supabaseReady = isSupabaseConfigured();
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center gap-10 px-4 py-16">
-      <header className="space-y-3">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-black/50 dark:text-white/50">
-          Nashville 2026
-        </p>
-        <h1 className="text-4xl font-semibold tracking-tight">Hackathon shell</h1>
-        <p className="text-black/60 dark:text-white/60">
+    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center gap-sp-5 px-sp-2 py-sp-8">
+      <header className="space-y-sp-1.5">
+        <LogoMark className="mb-sp-3 h-12 w-auto" />
+        <p className="text-scale-2 font-semibold uppercase text-text-light">Nashville 2026</p>
+        <h1 className="text-scale-8 font-semibold">Hackathon shell</h1>
+        <p className="text-scale-4 text-text-medium">
           Next.js on Vercel, deploying automatically from <code>main</code>.
         </p>
       </header>
 
       <Link
         href="/ideas"
-        className="flex items-center justify-between rounded-xl border border-black/10 px-5 py-4 transition-colors hover:border-black/30 dark:border-white/15 dark:hover:border-white/40"
+        className={`${card} flex items-center justify-between px-sp-2.5 py-sp-2 transition-shadow hover:border-card-border-active hover:shadow-hover-large`}
       >
         <span>
-          <span className="block text-sm font-medium">Idea board</span>
-          <span className="block text-sm text-black/60 dark:text-white/60">
+          <span className="block text-scale-4 font-semibold">Idea board</span>
+          <span className="block text-scale-3 text-text-medium">
             Submit ideas, vote for favorites, and discuss them with the team.
           </span>
         </span>
-        <span aria-hidden>→</span>
+        <span aria-hidden className="text-text-highlight">
+          →
+        </span>
       </Link>
 
-      <ul className="rounded-xl border border-black/10 px-5 dark:border-white/15">
+      <ul className={`${card} px-sp-2.5`}>
         <Check
           label="Next.js app router"
           state="ok"
@@ -76,9 +83,9 @@ export default function Home() {
         />
       </ul>
 
-      <p className="text-sm text-black/50 dark:text-white/50">
+      <p className="text-scale-3 text-text-light">
         Live status:{" "}
-        <a className="underline underline-offset-4" href="/api/health">
+        <a className={link} href="/api/health">
           /api/health
         </a>
       </p>
