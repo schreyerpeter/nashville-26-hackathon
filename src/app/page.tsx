@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LogoMark } from "@/components/ui/logo";
 import { card, link } from "@/components/ui/styles";
+import { DISCOURSE_URL } from "@/lib/discourse/connect";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +61,23 @@ export default function Home() {
           →
         </span>
       </Link>
+
+      {DISCOURSE_URL && (
+        <a
+          href={DISCOURSE_URL}
+          className={`${card} flex items-center justify-between px-sp-2.5 py-sp-2 transition-shadow hover:border-card-border-active hover:shadow-hover-large`}
+        >
+          <span>
+            <span className="block text-scale-4 font-semibold">Community</span>
+            <span className="block text-scale-3 text-text-medium">
+              A patient forum behind QuickMD sign-in, where everyone posts under a pseudonym.
+            </span>
+          </span>
+          <span aria-hidden className="text-text-highlight">
+            →
+          </span>
+        </a>
+      )}
 
       <ul className={`${card} px-sp-2.5`}>
         <Check

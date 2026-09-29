@@ -75,3 +75,10 @@ src/
   lib/supabase/           browser client, server client, env guards, DB types
 supabase/migrations/      schema and row level security
 ```
+
+## Community forum
+
+`/api/discourse/sso` makes this app the DiscourseConnect provider for a self-hosted
+Discourse: patients sign in with their QuickMD account and appear on the forum under a
+pseudonym. See [DISCOURSE.md](DISCOURSE.md) for the flow, the Azure setup, and the
+path to production.
