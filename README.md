@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# nashville-26-hackathon
 
-## Getting Started
+Project shell for the Nashville 2026 hackathon. Next.js (App Router, TypeScript,
+Tailwind) on Vercel, with Supabase wiring in place and continuous deployment from
+`main`.
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local   # fill in once the Supabase project exists
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app runs at http://localhost:3000. `/api/health` reports the environment, the
+deployed commit, and whether Supabase is reachable.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploys
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Pushing to `main` builds and promotes to production. Pushing any other branch
+produces a preview deployment with its own URL.
 
-## Learn More
+## Supabase
 
-To learn more about Next.js, take a look at the following resources:
+Credentials come from the Supabase dashboard under Project Settings then API:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Variable | Value |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Publishable (anon) key |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Both are safe to expose to the browser; row level security is what protects the
+data, so enable it on every table you add.
 
-## Deploy on Vercel
+Use `createClient()` from `@/lib/supabase/server` in Server Components and Route
+Handlers, and from `@/lib/supabase/client` in Client Components. Both throw a
+clear error when the credentials are missing rather than failing deeper in a
+request, and `isSupabaseConfigured()` from `@/lib/supabase/env` lets a page
+degrade gracefully instead of throwing at all.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Layout
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/
+    api/health/route.ts   deployment and Supabase status
+    page.tsx              landing shell
+  lib/supabase/           browser client, server client, env guards
+```
