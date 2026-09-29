@@ -38,8 +38,8 @@ Not in scope: in-app entry point, onboarding and cohort spaces, hosted presence/
 ## Build order (defaults picked for speed; change any of them)
 
 ### 1. Safety net (≈half the demo)
-- [ ] **Discourse settings** (admin UI on the dev VM, or a seed script using the admin
-  API so it can be rerun):
+- [ ] **Discourse settings** (admin UI on the local Discourse at http://localhost:4200, or
+  a seed script using the admin API so it can be rerun):
   - watched words: diversion terms → Block, crisis terms → Require approval
   - pending-post message = the resource copy (988, 911, SAMHSA 1-800-662-4357, "message
     your care team")
@@ -118,5 +118,6 @@ Each gate needs one named approver and a pass condition. None of them block the 
 - AGENTS.md: read `node_modules/next/dist/docs/` before writing route handlers or cron
   config. This Next.js version has breaking changes.
 - UI changes (DevTools buttons, the chart) must use the QuickMD tokens in DESIGN.md.
-- Installing Discourse AI means a container rebuild on the VM (~10 min). Do it first,
-  or drop it and demo on watched words alone.
+- Discourse AI is bundled with Discourse (`plugins/discourse-ai` in `~/quickmd/discourse`),
+  so there is nothing to install locally; it only needs enabling and an LLM configured.
+  If that takes too long, drop it and demo on watched words alone.
