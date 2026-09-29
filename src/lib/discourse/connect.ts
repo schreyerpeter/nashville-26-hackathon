@@ -74,3 +74,23 @@ export function returnUrlFor(request: ConnectRequest, patient: Patient) {
   url.searchParams.set("sig", sign(payload));
   return url.toString();
 }
+
+// An admin API key, so signing out here can also end the patient's forum session.
+const API_KEY = process.env.DISCOURSE_API_KEY ?? "";
+
+/** Logs the patient out of Discourse everywhere. Best effort: the app's sign-out doesn't wait on the forum. */
+export async function logOutOfForum(externalId: string) {
+  if (!API_KEY || !DISCOURSE_URL) return;
+  const headers = { "Api-Key": API_KEY, "Api-Username": "system", Accept: "application/json" };
+  try {
+    const found = await fetch(new URL(`/u/by-external/${encodeURIComponent(externalId)}.json`, DISCOURSE_URL), {
+      headers,
+      cache: "no-store",
+    });
+    if (!found.ok) return;
+    const { user } = await found.json();
+    await fetch(new URL(`/admin/users/${user.id}/log_out.json`, DISCOURSE_URL), { method: "POST", headers });
+  } catch {
+    // The forum being down shouldn't stop anyone signing out of the app.
+  }
+}

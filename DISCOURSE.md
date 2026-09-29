@@ -11,12 +11,20 @@ DiscourseConnect provider, and QuickMD is the only source of identity.
 2. That route checks Discourse's HMAC-SHA256 signature and makes sure `return_sso_url`
    points at `DISCOURSE_URL`. Without that check, a forged request could have us send
    a signed identity to another site.
-3. If the `qmd_patient_token` cookie holds a live session, the route looks up the
-   patient with `GET api/v1/profile` and sends the browser straight back to Discourse.
+3. If the `qmd_patient_session` cookie holds a valid session, the route sends the
+   browser straight back to Discourse.
 4. Otherwise the patient signs in at `/community/login`. The action calls the
-   patient-web API's `POST api/v2/auth/login`, stores the Stytch session JWT (60 minutes)
-   in an httpOnly cookie, and completes the handshake.
+   patient-web API's `POST api/v2/auth/login`, then looks up the patient with
+   `GET api/v1/profile`, and completes the handshake. It keeps that patient in an
+   HMAC-signed, httpOnly cookie for 30 days.
 5. Discourse checks its own nonce, then creates or updates the user.
+
+The app keeps its own session, just as any identity provider does, and doesn't hold on to
+the Stytch JWT. That JWT expires after 60 minutes, while Discourse keeps its session much
+longer, so the app would forget a patient the forum still shows as signed in. Discourse's
+`maximum_session_age` is set to 720 hours, so both sessions last 30 days. Signing out of
+either one ends both. Discourse's `logout_redirect` clears the app's cookie. The app's
+sign-out calls the admin API (`DISCOURSE_API_KEY`) to log the patient out of the forum.
 
 What reaches Discourse is limited to:
 
@@ -135,13 +143,12 @@ Login works without email. Only notifications and digests need it.
 ## DevTools (for demos)
 
 A floating panel, ported in slimmed-down form from the design system's DevTools
-(`features/devTools`), sits in the bottom-right corner of every page. It follows the same
-rules: it's on everywhere except production, where you open it with `?devTools=true`
-(remembered in localStorage) and turn it off with `?devTools=false`.
+(`features/devTools`), sits in the bottom-right corner of every page. It's always on,
+production included, because this app exists to be demoed.
 
-- **Demo tab:** shows who the session cookie belongs to, with their pseudonym and groups.
-  It also has a one-click "Sign in as test patient" and short notes about gimli and
-  email verification.
+- **Demo tab:** shows whose session the app holds, with their pseudonym and groups. It
+  also has a one-click "Sign in as test patient", "Sign out everywhere", and short notes
+  about gimli and email verification.
 - **Environment tab:** the commit, the patient API, the Discourse URL, and whether the
   DiscourseConnect secret is set.
 

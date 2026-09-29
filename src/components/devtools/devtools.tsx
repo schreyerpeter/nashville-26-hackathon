@@ -5,33 +5,13 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { signInAsDemoPatient } from "@/app/community/login/actions";
 import { button, card, link } from "@/components/ui/styles";
 
-import { getSession, type Session } from "./actions";
+import { getDevToolsSession, type Session } from "./actions";
 
 // A slimmed-down port of the design system's DevTools (features/devTools): the same
-// enablement rules and floating panel, with a Demo tab in place of the console, network,
-// and storage panels, which the browser's own devtools already cover.
-const DEV_TOOLS_KEY = "devTools";
-
-/**
- * Mirrors getIsDevToolsEnabled: an explicit `false` in the URL or storage wins, and
- * production needs `?devTools=true`. Unlike the design system, this remembers a URL
- * value, so one link turns the panel on for the rest of a demo.
- */
-function isDevToolsEnabled(isProduction: boolean) {
-  const urlValue = new URLSearchParams(window.location.search).get(DEV_TOOLS_KEY);
-  let storageValue: string | null = null;
-  try {
-    if (urlValue === "true" || urlValue === "false") localStorage.setItem(DEV_TOOLS_KEY, urlValue);
-    storageValue = localStorage.getItem(DEV_TOOLS_KEY);
-  } catch {
-    // Storage can be missing in private or embedded browsers; fall through to the URL.
-  }
-  if (urlValue === "false" || storageValue === "false") return false;
-  return !isProduction || urlValue === "true" || storageValue === "true";
-}
+// floating panel, with a Demo tab in place of the console, network, and storage panels,
+// which the browser's own devtools already cover. Always on, since this app is a demo.
 
 export type DevToolsProps = {
-  isProduction: boolean;
   environment: Record<string, string>;
   forumUrl: string;
   docUrl: string;
@@ -41,17 +21,8 @@ export type DevToolsProps = {
 type Tab = "demo" | "environment";
 
 export function DevTools(props: DevToolsProps) {
-  const [enabled, setEnabled] = useState(false);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("demo");
-
-  useEffect(() => {
-    // Reads window and storage, so it can only run after hydration.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setEnabled(isDevToolsEnabled(props.isProduction));
-  }, [props.isProduction]);
-
-  if (!enabled) return null;
 
   if (!open) {
     return (
@@ -124,7 +95,7 @@ function DemoTab({ forumUrl, docUrl, demoPatientEmail, environment }: DevToolsPr
   const [pending, startTransition] = useTransition();
 
   const refresh = useCallback(() => {
-    getSession().then(setSession, () => setSession({ signedIn: false }));
+    getDevToolsSession().then(setSession, () => setSession({ signedIn: false }));
   }, []);
   useEffect(refresh, [refresh]);
 
@@ -155,12 +126,14 @@ function DemoTab({ forumUrl, docUrl, demoPatientEmail, environment }: DevToolsPr
             </p>
           </>
         ) : (
-          <p className="text-text-medium">Not signed in to the app.</p>
+          <p className="text-text-medium">
+            Not signed in. Opening the forum will ask for a QuickMD sign-in.
+          </p>
         )}
         <div className="flex flex-wrap gap-sp-1 pt-sp-0.5">
           {session?.signedIn && (
             <a href="/api/discourse/logout" className={button("secondary", "s")}>
-              Sign out of app
+              Sign out everywhere
             </a>
           )}
           <button type="button" onClick={refresh} className={button("tertiary", "s")}>
@@ -206,7 +179,10 @@ function DemoTab({ forumUrl, docUrl, demoPatientEmail, environment }: DevToolsPr
             Patients with an unverified email wait for a confirmation email, which can&apos;t send until
             Azure email is set up.
           </li>
-          <li>Signing out of the forum also clears the app&apos;s session.</li>
+          <li>
+            The app and the forum each keep a session for up to 30 days. Signing out of either one
+            signs you out of both.
+          </li>
         </ul>
       </Section>
 

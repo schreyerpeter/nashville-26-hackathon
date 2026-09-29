@@ -9,7 +9,6 @@ export const COMMUNITY_DOC_URL = "https://claude.ai/code/artifact/832f2ffe-0df1-
 export function DevToolsShell() {
   return (
     <DevTools
-      isProduction={process.env.VERCEL_ENV === "production"}
       environment={{
         App: "nashville-26-hackathon",
         Environment: process.env.VERCEL_ENV ?? "local",

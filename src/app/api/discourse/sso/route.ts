@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { returnUrlFor, verifyRequest } from "@/lib/discourse/connect";
-import { getPatient, getSessionToken } from "@/lib/quickmd/api";
+import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
-// Discourse's `discourse_connect_url`. A signed-in patient goes straight back to the
+// Discourse's `discourse_connect_url`. A patient with a session goes straight back to the
 // forum; anyone else signs in first and the login action finishes the handshake.
 export async function GET(request: NextRequest) {
   const sso = request.nextUrl.searchParams.get("sso");
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const connect = verifyRequest(sso, sig);
   if (!connect) return new NextResponse("Invalid DiscourseConnect request.", { status: 400 });
 
-  const patient = await getPatient(await getSessionToken());
+  const patient = await getSession();
   if (patient) return NextResponse.redirect(returnUrlFor(connect, patient));
 
   const login = new URL("/community/login", request.url);

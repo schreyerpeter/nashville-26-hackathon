@@ -1,5 +1,3 @@
-import { cookies } from "next/headers";
-
 // Patients sign in against the same patient-web API that doctorvisit.quick.md uses.
 // Point this at a dev environment, e.g. https://patient-web-api.gimli.quickmd.dev/
 export const QUICKMD_API_URL = process.env.QUICKMD_API_URL ?? "";
@@ -8,10 +6,6 @@ export const QUICKMD_API_URL = process.env.QUICKMD_API_URL ?? "";
 // sign-in. Server-only, so the password never reaches the browser.
 export const DEMO_PATIENT_EMAIL = process.env.DEMO_PATIENT_EMAIL ?? "";
 export const DEMO_PATIENT_PASSWORD = process.env.DEMO_PATIENT_PASSWORD ?? "";
-
-// The Stytch session JWT the API hands back. It lives 60 minutes, so the cookie does too.
-const TOKEN_COOKIE = "qmd_patient_token";
-const TOKEN_TTL = 60 * 60;
 
 export type Patient = {
   globalKey: string;
@@ -60,23 +54,4 @@ export async function getPatient(token: string | undefined): Promise<Patient | n
     emailVerified: profile.IsEmailVerified === true,
     cohorts: profile.Cohorts ?? [],
   };
-}
-
-export async function getSessionToken() {
-  return (await cookies()).get(TOKEN_COOKIE)?.value;
-}
-
-/** Only callable from Server Actions and Route Handlers. */
-export async function setSessionToken(token: string) {
-  (await cookies()).set(TOKEN_COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: TOKEN_TTL,
-    path: "/",
-  });
-}
-
-export async function clearSessionToken() {
-  (await cookies()).delete(TOKEN_COOKIE);
 }

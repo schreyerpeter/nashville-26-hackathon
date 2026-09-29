@@ -8,8 +8,8 @@ import {
   DEMO_PATIENT_PASSWORD,
   getPatient,
   login,
-  setSessionToken,
 } from "@/lib/quickmd/api";
+import { startSession } from "@/lib/session";
 
 export type FormState = { error: string | null; email?: string };
 
@@ -24,7 +24,7 @@ async function signInWith(email: string, password: string, sso: string, sig: str
 
   const patient = await getPatient(result.token);
   if (!patient) return { error: "That account isn't a patient account.", email };
-  await setSessionToken(result.token);
+  await startSession(patient);
 
   // Arriving from Discourse, finish the handshake. Arriving directly, open the forum,
   // which starts a fresh handshake that our new cookie answers without a second login.
